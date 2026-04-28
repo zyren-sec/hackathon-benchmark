@@ -1,0 +1,41 @@
+id,category,criterion,description,max_points,measurement,formula,source_tests,notes
+SEC-01,Security Effectiveness,Exploit Prevention,Block exploit attempts across the V01-V19 vulnerability families,15,auto,15 × prevention_rate,V01-V19,"Covers SQLi (classic/UNION/blind), XSS (reflected/stored), path traversal (raw/encoded), SSRF (metadata/internal), CRLF, host header, content-type bypass, malformed/oversized/deeply-nested JSON. False-positive penalty applied via Phase C golden-path traffic."
+SEC-02,Security Effectiveness,Outbound Filtering,Strip leaked data from responses,5,auto,5 × filter_rate,L01-L05,"L01 stack traces; L02 internal IP header; L03 debug SQL header; L04 PII fields (card/bank/SSN); L05 verbose 404 paths."
+SEC-03,Security Effectiveness,Abuse Detection,Detect brute force / credential stuffing / spraying / recon,10,auto,10 × detection_rate,Abuse suite,"Brute force, credential stuffing, password spraying, behavioral anomalies, recon/enumeration."
+SEC-04,Security Effectiveness,Canary Detection,Block all canary endpoints,2,auto,binary (all-or-nothing),"/admin-test, /api-debug, /.env, /wp-admin","Must detect all 4 canaries. Partial coverage scores 0."
+SEC-05,Security Effectiveness,Risk Lifecycle,Risk score correctness across 7 sequential steps,8,auto,sum of step scores,Risk lifecycle suite,"Steps: initial state, attack detection, canary max, device-carry persistence, score decay, challenge mid-range, challenge success recovery. PoW or JS challenge required for step 7."
+PERF-01,Performance,p99 Latency,p99 latency overhead at 5k RPS,10,auto,binary (≤5ms = 10; else 0),Phase D latency,Measured against baseline (no-WAF) at 5000 RPS sustained.
+PERF-02,Performance,Throughput,Sustained RPS while p99 ≤ 5ms,5,auto,binary (≥5000 RPS = 5; else 0),Phase D throughput,Must sustain target rate without error spike.
+PERF-03,Performance,Memory Footprint,Peak RSS under load,3,auto,binary (<100MB = 3; else 0),Phase D memory,Sampled at 5k RPS sustained.
+PERF-04,Performance,Graceful Degradation,Behavior at 2× target load,2,auto,binary (no crash AND error rate < 5%),Phase D burst,Tested at 10000 RPS for 60s; crash or >5% errors = 0.
+INT-01,Intelligence & Adaptiveness,Transaction Fraud Detection,Detect fraudulent transactions,4,auto,4 × pass_rate,TF01-TF04,"Velocity, geo-anomaly, value-anomaly, mule patterns."
+INT-02,Intelligence & Adaptiveness,Behavioral Anomaly Detection,Detect anomalous user behavior,4,auto,4 × pass_rate,BA01-BA05,"Session sequence, navigation, timing, UA fingerprint, request cadence."
+INT-03,Intelligence & Adaptiveness,Relay Detection,Detect proxy / relay attackers,4,auto,4 × pass_rate,AR01-AR06,"Proxy chains, IP rotation, fingerprint/header mismatch."
+INT-04,Intelligence & Adaptiveness,Resilience / DDoS,Survive HTTP flood / slowloris / fail-mode tests,8,auto,sum of sub-scores,D01-D09,"HTTP flood 3pt; slowloris 2pt; RUDY 2pt; fail-close + fail-open combined 7pt; circuit breaker 2pt; backend timeout 1pt; recovery 1pt; hot-reload 2pt (capped at 8 total)."
+EXT-01,Extensibility,Hot-reload Add Rule,Add a new rule without restart,3,auto,binary,Phase E config,Rule must take effect within reload SLA defined in benchmark spec.
+EXT-02,Extensibility,Hot-reload Remove Rule,Remove an existing rule without restart,3,auto,binary,Phase E config,Rule must stop blocking within reload SLA.
+EXT-03,Extensibility,Caching Correctness,Cache behavior per route tier,4,auto,1 pt per sub-test,E01-E04,"MEDIUM cached; CRITICAL never cached; TTL expiry honored; auth routes never cached."
+ARCH-01,Architecture & Code Quality,Code Quality / Idioms,Idiomatic Rust / structure / readability,5,manual,judge 0-5,,"Rubric: 0=unreadable; 2=acceptable; 4=clean idiomatic; 5=exemplary."
+ARCH-02,Architecture & Code Quality,Error Handling & Safety,Result types / no unwrap in hot paths / no panics,4,manual,judge 0-4,,"Rubric: 0=panics common; 2=mostly safe; 4=robust everywhere."
+ARCH-03,Architecture & Code Quality,Test Coverage,Unit + integration tests,3,manual,judge 0-3,,"Rubric: 0=none; 1=smoke only; 2=≥40%; 3=≥70% incl. integration."
+ARCH-04,Architecture & Code Quality,Documentation,README + runbook + config docs,3,manual,judge 0-3,,"Rubric: 0=none; 1=README only; 2=README + runbook; 3=complete with examples."
+UI-01,Dashboard UI/UX,Live Attack Feed,Real-time visualization of attacks,2,manual,judge 0-2,,"Rubric: 0=none; 1=basic list; 2=clear visualization."
+UI-02,Dashboard UI/UX,Hot Config Controls,In-dashboard config / rule toggle,2,manual,judge 0-2,,"Rubric: 0=none; 1=read-only; 2=fully interactive."
+UI-03,Dashboard UI/UX,Real-time Log Readability,Log stream usability,1,manual,binary,,Present and human-readable = 1; else 0.
+UI-04,Dashboard UI/UX,Observability Headers,Standard X-WAF-* headers present (≥95% of responses),5,auto,1 pt per header,Header probe,"X-WAF-Request-Id, X-WAF-Risk-Score, X-WAF-Action, X-WAF-Rule-Id, X-WAF-Cache."
+DEP-01,Deployment & Operability,Single Binary + Startup,Single binary with documented startup,2,manual,judge 0-2,,"Rubric: 0=manual steps required; 1=script needed; 2=single command."
+DEP-02,Deployment & Operability,Configurable Fail-mode,Per-tier fail-close / fail-open in YAML or TOML,2,hybrid,binary (config + behavior),,"CRITICAL routes fail-close (503); MEDIUM / CATCH-ALL fail-open. Hardcoded behavior scores 0."
+DEP-03,Deployment & Operability,Audit Log Format,Audit log conforms to spec format,1,manual,binary,,Per waf_interop_contract_v2.1.md.
+,,,,,,,,
+==,DISQUALIFICATION GATES,,Evaluated BEFORE scoring; any single fail = DQ,,,,,
+DQ-01,Disqualification,Fake data / staged demo,Fabricated benchmark results or pre-recorded responses,DQ,manual,binary,,Confirmed via reproduction on judge sandbox.
+DQ-02,Disqualification,Hardcoded test-case rules,Rules pattern-matching benchmarker payloads instead of attack classes,DQ,manual,binary,,Detected via mutation testing during Phase B.
+DQ-03,Disqualification,Manual intervention during Attack Battle,Operator action on the WAF mid-run,DQ,manual,binary,,Live observation by judges.
+DQ-04,Disqualification,Attacking other teams' sandboxes,Any traffic to a sandbox not your own,DQ,auto,binary,,Detected via network audit logs.
+,,,,,,,,
+==,TIE-BREAKERS,,Applied in order until tie is broken,,,,,
+TB-01,Tie-breaker,Security Effectiveness subtotal,Higher SEC-01..SEC-05 sum wins,,,,,
+TB-02,Tie-breaker,p99 latency,Lower measured p99 wins,,,,,
+TB-03,Tie-breaker,Intelligence & Adaptiveness subtotal,Higher INT-01..INT-04 sum wins,,,,,
+,,,,,,,,
+==,TOTAL,,,120,,,,Sum of SEC (40) + PERF (20) + INT (20) + EXT (10) + ARCH (15) + UI (10) + DEP (5)
