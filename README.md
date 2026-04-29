@@ -2,7 +2,7 @@
 
 > Automated security validation and scoring framework for evaluating Web Application Firewalls (WAFs) against the WAF Hackathon v2.1 contract.
 
-![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go&logoColor=white)
+![Go](https://img.shields.io/badge/Go-1.21%2B-00ADD8?logo=go&logoColor=white)
 ![Protocol](https://img.shields.io/badge/Protocol-v2.1-blue)
 ![Reports](https://img.shields.io/badge/Reports-JSON%20%7C%20HTML-green)
 ![Scope](https://img.shields.io/badge/Scope-WAF%20Security%20Benchmark-red)
@@ -163,38 +163,55 @@ The WAF should:
 
 ### 1. Clone and build
 
-For a new server or clean installation, clone into a fresh directory and build from the latest `main` commit:
+For a new server or clean installation, the only hard prerequisite is Go 1.21 or newer. The build will fail on older toolchains because this repository uses APIs such as `os.ReadFile` and dependencies that require Go 1.18+ and Go 1.21+.
+
+Verify the toolchain first:
+
+```bash
+go version
+```
+
+Expected output should be at least `go1.21.x`, for example `go version go1.24.2 linux/amd64`.
+
+Then clone and build:
 
 ```bash
 git clone https://github.com/zyren-sec/hackathon-benchmark.git
 cd hackathon-benchmark
-git log -1 --oneline
 make deps
 make build
 ```
 
-If you are reusing an old clone and `git pull` fails because local files such as `go.mod` or `go.sum` were modified by a previous failed build/test, reset the local clone before building:
+If Go is too old, `make deps` and `make build` now fail fast with a clear version error instead of surfacing confusing compiler errors from dependencies.
+
+If you do not want to install Go locally, build with Docker instead:
+
+```bash
+git clone https://github.com/zyren-sec/hackathon-benchmark.git
+cd hackathon-benchmark
+docker build -t waf-benchmark .
+```
+
+If you are reusing an old clone and want to rebuild from a clean state:
 
 ```bash
 cd /opt/hackathon-benchmark
 git fetch origin main
 git reset --hard origin/main
 git clean -fd
-make deps
-make build
-```
-
-If the server previously downloaded a bad or incompatible Go module cache and still reports a `fasthttp` package-mixing error, clear the module cache once and rebuild:
-
-```bash
 go clean -modcache
 make deps
 make build
 ```
 
-A correct checkout uses `github.com/valyala/fasthttp v1.50.0` in `go.mod` and should print a `make build` command containing the latest commit hash, not an older local commit.
+The errors below are a strong signal that the machine is using an outdated Go toolchain and must be upgraded before building:
 
-> Note: the current Go module path in `go.mod` is still `github.com/waf-hackathon/benchmark`. That does not block building from the new GitHub repository, but update the module path separately if you want all package import paths and CLI help text to match `github.com/zyren-sec/hackathon-benchmark`.
+- `note: module requires Go 1.18`
+- `note: module requires Go 1.21`
+- `undefined: os.ReadFile`
+- `undefined: context.WithCancelCause`
+
+> Note: the current module path in `go.mod` remains `github.com/waf-hackathon/benchmark`. That does not prevent builds from `https://github.com/zyren-sec/hackathon-benchmark`, because the import path inside the module can differ from the Git remote URL.
 
 The binary will be created at:
 

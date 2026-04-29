@@ -1,10 +1,12 @@
-.PHONY: build test clean install deps fmt lint help docker-build
+.PHONY: build test clean install deps fmt lint help docker-build check-go-version
 
 # Variables
 BINARY_NAME := waf-benchmark
 MODULE := github.com/waf-hackathon/benchmark
 VERSION := 2.1.0
 BUILD_DIR := ./bin
+GO_MIN_VERSION := 1.21
+GO_VERSION := $(shell go env GOVERSION 2>/dev/null | sed 's/^go//')
 LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
 # Default target
@@ -15,8 +17,22 @@ help:
 	@echo "Available targets:"
 	@grep -E '^##' $(MAKEFILE_LIST) | sed 's/## /  /'
 
+## check-go-version: Validate the installed Go toolchain version
+check-go-version:
+	@if ! command -v go >/dev/null 2>&1; then \
+		echo "Error: Go is not installed. Install Go $(GO_MIN_VERSION)+ or use 'docker build -t waf-benchmark .'"; \
+		exit 1; \
+	fi
+	@printf '%s\n%s\n' "$(GO_MIN_VERSION)" "$(GO_VERSION)" | sort -V -C || { \
+		echo "Error: Go $(GO_MIN_VERSION)+ is required, found $(GO_VERSION)."; \
+		echo "Install a newer Go release, then run 'make deps && make build' again."; \
+		echo "Docker fallback: docker build -t waf-benchmark ."; \
+		exit 1; \
+	}
+	@echo "Using Go $(GO_VERSION)"
+
 ## build: Build the binary
-build:
+build: check-go-version
 	@echo "Building $(BINARY_NAME)..."
 	@mkdir -p $(BUILD_DIR)
 	go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/waf-benchmark
@@ -45,7 +61,7 @@ install: build
 	@cp $(BUILD_DIR)/$(BINARY_NAME) $(GOPATH)/bin/$(BINARY_NAME) 2>/dev/null || cp $(BUILD_DIR)/$(BINARY_NAME) $(HOME)/go/bin/$(BINARY_NAME) 2>/dev/null || echo "Please add $(BUILD_DIR) to your PATH"
 
 ## deps: Download and verify dependencies
-deps:
+deps: check-go-version
 	@echo "Downloading dependencies..."
 	go mod download
 	go mod verify
