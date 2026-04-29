@@ -163,12 +163,36 @@ The WAF should:
 
 ### 1. Clone and build
 
+For a new server or clean installation, clone into a fresh directory and build from the latest `main` commit:
+
 ```bash
 git clone https://github.com/zyren-sec/hackathon-benchmark.git
 cd hackathon-benchmark
+git log -1 --oneline
 make deps
 make build
 ```
+
+If you are reusing an old clone and `git pull` fails because local files such as `go.mod` or `go.sum` were modified by a previous failed build/test, reset the local clone before building:
+
+```bash
+cd /opt/hackathon-benchmark
+git fetch origin main
+git reset --hard origin/main
+git clean -fd
+make deps
+make build
+```
+
+If the server previously downloaded a bad or incompatible Go module cache and still reports a `fasthttp` package-mixing error, clear the module cache once and rebuild:
+
+```bash
+go clean -modcache
+make deps
+make build
+```
+
+A correct checkout uses `github.com/valyala/fasthttp v1.50.0` in `go.mod` and should print a `make build` command containing the latest commit hash, not an older local commit.
 
 > Note: the current Go module path in `go.mod` is still `github.com/waf-hackathon/benchmark`. That does not block building from the new GitHub repository, but update the module path separately if you want all package import paths and CLI help text to match `github.com/zyren-sec/hackathon-benchmark`.
 
@@ -181,6 +205,7 @@ The binary will be created at:
 You can also build directly:
 
 ```bash
+mkdir -p ./bin
 go build -o ./bin/waf-benchmark ./cmd/waf-benchmark
 ```
 
