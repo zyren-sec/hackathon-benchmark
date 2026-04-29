@@ -4,7 +4,7 @@
 *.dll
 *.so
 *.dylib
-waf-benchmark
+/waf-benchmark
 
 # Test binary, built with `go test -c`
 *.test
@@ -37,6 +37,8 @@ reports/
 *.log
 *.json
 !benchmark_config.yaml
+!testdata/
+!testdata/app_capabilities.json
 
 # Build artifacts
 bin/

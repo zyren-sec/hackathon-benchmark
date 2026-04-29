@@ -1,0 +1,6 @@
+# Sample Tor/relay IPs for benchmark abuse simulation.
+# Replace with an authoritative feed in private deployments if needed.
+127.0.0.20
+127.0.0.21
+127.0.0.22
+127.0.0.23

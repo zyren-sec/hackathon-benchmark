@@ -5,7 +5,7 @@ BINARY_NAME := waf-benchmark
 MODULE := github.com/waf-hackathon/benchmark
 VERSION := 2.1.0
 BUILD_DIR := ./bin
-LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.commit=$(shell git rev-parse --short HEAD 2>/dev/null || unknown)"
+LDFLAGS := -ldflags "-X main.version=$(VERSION) -X main.commit=$(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
 # Default target
 all: build
