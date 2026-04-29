@@ -25,6 +25,9 @@ go.work
 *.swo
 *~
 
+# Local/private documentation excluded from public GitHub push
+docs/
+
 # OS files
 .DS_Store
 Thumbs.db
