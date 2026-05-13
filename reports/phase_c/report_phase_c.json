@@ -1,0 +1,532 @@
+{
+  "phase": "C",
+  "timestamp": "2026-05-12T13:17:47+07:00",
+  "waf_target": "http://220.158.233.101:8080",
+  "waf_mode": "enforce",
+  "duration_ms": 158269,
+  "reset_sequence": [
+    {
+      "step": 1,
+      "name": "Reset UPSTREAM",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.077719
+    },
+    {
+      "step": 2,
+      "name": "UPSTREAM health check",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.296311
+    },
+    {
+      "step": 3,
+      "name": "Set WAF profile (enforce)",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.141594
+    },
+    {
+      "step": 4,
+      "name": "Flush WAF cache",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.600849
+    },
+    {
+      "step": 5,
+      "name": "Reset WAF state",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.515273
+    }
+  ],
+  "reset_all_passed": true,
+  "waf_pid": "937143",
+  "memory_monitoring_enabled": true,
+  "baseline_latency": {
+    "classes": [
+      {
+        "name": "critical",
+        "endpoints": [
+          "/login",
+          "/deposit",
+          "/withdraw"
+        ],
+        "samples": 150,
+        "p50_ms": 0.693425,
+        "p99_ms": 2.9638669999999996,
+        "avg_ms": 0.8168614866666669
+      },
+      {
+        "name": "high",
+        "endpoints": [
+          "/api/profile",
+          "/game/list"
+        ],
+        "samples": 100,
+        "p50_ms": 0.6755300000000001,
+        "p99_ms": 1.693654,
+        "avg_ms": 0.7651894399999999
+      },
+      {
+        "name": "medium",
+        "endpoints": [
+          "/static/js/app.js",
+          "/static/css/style.css",
+          "/api/transactions"
+        ],
+        "samples": 100,
+        "p50_ms": 1.40055,
+        "p99_ms": 3.5511969999999997,
+        "avg_ms": 1.4771859090909092
+      },
+      {
+        "name": "catch_all",
+        "endpoints": [
+          "/health",
+          "/"
+        ],
+        "samples": 100,
+        "p50_ms": 0.7098850000000001,
+        "p99_ms": 2.5784559999999996,
+        "avg_ms": 0.8106364
+      }
+    ],
+    "total_samples": 450
+  },
+  "waf_latency": {
+    "classes": [
+      {
+        "name": "critical",
+        "endpoints": [
+          "/login",
+          "/deposit",
+          "/withdraw"
+        ],
+        "samples": 150,
+        "p50_ms": 14.005594,
+        "p99_ms": 20.619486,
+        "avg_ms": 14.74071902,
+        "overhead_p50_ms": 13.312169,
+        "overhead_p99_ms": 17.655618999999998,
+        "overhead_pct": 1704.5555165235965
+      },
+      {
+        "name": "high",
+        "endpoints": [
+          "/api/profile",
+          "/game/list"
+        ],
+        "samples": 100,
+        "p50_ms": 15.069256,
+        "p99_ms": 24.080095,
+        "avg_ms": 16.363540430000004,
+        "overhead_p50_ms": 14.393726,
+        "overhead_p99_ms": 22.386441,
+        "overhead_pct": 2038.4953286861887
+      },
+      {
+        "name": "medium",
+        "endpoints": [
+          "/static/js/app.js",
+          "/static/css/style.css",
+          "/api/transactions"
+        ],
+        "samples": 100,
+        "p50_ms": 16.177577,
+        "p99_ms": 22.152404,
+        "avg_ms": 16.4549802929293,
+        "overhead_p50_ms": 14.777027,
+        "overhead_p99_ms": 18.601207000000002,
+        "overhead_pct": 1013.9410545187257
+      },
+      {
+        "name": "catch_all",
+        "endpoints": [
+          "/health",
+          "/"
+        ],
+        "samples": 100,
+        "p50_ms": 13.776957,
+        "p99_ms": 23.209003,
+        "avg_ms": 13.283067669999998,
+        "overhead_p50_ms": 13.067072,
+        "overhead_p99_ms": 20.630547,
+        "overhead_pct": 1538.5974858765283
+      }
+    ],
+    "total_samples": 450
+  },
+  "load_test_steps": [
+    {
+      "step_num": 1,
+      "target_rps": 1000,
+      "actual_rps": 49.8,
+      "duration_sec": 30,
+      "total_requests": 1494,
+      "success_count": 1494,
+      "error_count": 0,
+      "blocked_count": 0,
+      "success_rate": 1,
+      "error_rate": 0,
+      "blocked_rate": 0,
+      "p50_latency_ms": 206.949,
+      "p99_latency_ms": 343.02,
+      "max_latency_ms": 415.414,
+      "memory_peak_mb": 14.05859375,
+      "false_positive_count": 0,
+      "collateral_count": 0,
+      "ddos_bursts_triggered": 3,
+      "passed": true
+    },
+    {
+      "step_num": 2,
+      "target_rps": 3000,
+      "actual_rps": 40.2,
+      "duration_sec": 30,
+      "total_requests": 1206,
+      "success_count": 1206,
+      "error_count": 0,
+      "blocked_count": 0,
+      "success_rate": 1,
+      "error_rate": 0,
+      "blocked_rate": 0,
+      "p50_latency_ms": 255.229,
+      "p99_latency_ms": 438.273,
+      "max_latency_ms": 569.393,
+      "memory_peak_mb": 14.1484375,
+      "false_positive_count": 0,
+      "collateral_count": 0,
+      "ddos_bursts_triggered": 3,
+      "passed": true
+    },
+    {
+      "step_num": 3,
+      "target_rps": 5000,
+      "actual_rps": 30.566666666666666,
+      "duration_sec": 60,
+      "total_requests": 1834,
+      "success_count": 1834,
+      "error_count": 0,
+      "blocked_count": 0,
+      "success_rate": 1,
+      "error_rate": 0,
+      "blocked_rate": 0,
+      "p50_latency_ms": 346.302,
+      "p99_latency_ms": 546.768,
+      "max_latency_ms": 640.685,
+      "memory_peak_mb": 13.921875,
+      "false_positive_count": 0,
+      "collateral_count": 0,
+      "ddos_bursts_triggered": 6,
+      "passed": true
+    },
+    {
+      "step_num": 4,
+      "target_rps": 10000,
+      "actual_rps": 22.133333333333333,
+      "duration_sec": 30,
+      "total_requests": 664,
+      "success_count": 664,
+      "error_count": 0,
+      "blocked_count": 0,
+      "success_rate": 1,
+      "error_rate": 0,
+      "blocked_rate": 0,
+      "p50_latency_ms": 455.944,
+      "p99_latency_ms": 890.35,
+      "max_latency_ms": 1203.613,
+      "memory_peak_mb": 14.16015625,
+      "false_positive_count": 0,
+      "collateral_count": 0,
+      "ddos_bursts_triggered": 3,
+      "passed": true
+    }
+  ],
+  "throughput_time_series": [
+    {
+      "timestamp_sec": 5,
+      "actual_rps": 62.590293159349265
+    },
+    {
+      "timestamp_sec": 10,
+      "actual_rps": 54.9952505991592
+    },
+    {
+      "timestamp_sec": 15,
+      "actual_rps": 51.39821915792916
+    },
+    {
+      "timestamp_sec": 20,
+      "actual_rps": 51.049808052721716
+    },
+    {
+      "timestamp_sec": 25,
+      "actual_rps": 50.599181260719924
+    },
+    {
+      "timestamp_sec": 30,
+      "actual_rps": 49.46495196740438
+    },
+    {
+      "timestamp_sec": 5,
+      "actual_rps": 42.39752399307831
+    },
+    {
+      "timestamp_sec": 10,
+      "actual_rps": 43.19689339605857
+    },
+    {
+      "timestamp_sec": 15,
+      "actual_rps": 42.663714499745396
+    },
+    {
+      "timestamp_sec": 20,
+      "actual_rps": 42.19869576490999
+    },
+    {
+      "timestamp_sec": 25,
+      "actual_rps": 40.91853321298081
+    },
+    {
+      "timestamp_sec": 30,
+      "actual_rps": 39.866112483850415
+    },
+    {
+      "timestamp_sec": 5,
+      "actual_rps": 30.398064658576608
+    },
+    {
+      "timestamp_sec": 10,
+      "actual_rps": 29.597347905963005
+    },
+    {
+      "timestamp_sec": 15,
+      "actual_rps": 29.2660430853313
+    },
+    {
+      "timestamp_sec": 20,
+      "actual_rps": 29.64923255185232
+    },
+    {
+      "timestamp_sec": 25,
+      "actual_rps": 30.159711937352956
+    },
+    {
+      "timestamp_sec": 30,
+      "actual_rps": 30.499424028543693
+    },
+    {
+      "timestamp_sec": 35,
+      "actual_rps": 30.62847390225993
+    },
+    {
+      "timestamp_sec": 40,
+      "actual_rps": 30.424248366662283
+    },
+    {
+      "timestamp_sec": 45,
+      "actual_rps": 30.46608972829441
+    },
+    {
+      "timestamp_sec": 50,
+      "actual_rps": 30.459264029251266
+    },
+    {
+      "timestamp_sec": 55,
+      "actual_rps": 30.436326483569978
+    },
+    {
+      "timestamp_sec": 60,
+      "actual_rps": 30.39955272986071
+    },
+    {
+      "timestamp_sec": 5,
+      "actual_rps": 28.39735350296082
+    },
+    {
+      "timestamp_sec": 10,
+      "actual_rps": 23.399073244605535
+    },
+    {
+      "timestamp_sec": 15,
+      "actual_rps": 22.06565280729087
+    },
+    {
+      "timestamp_sec": 20,
+      "actual_rps": 21.79913356400767
+    },
+    {
+      "timestamp_sec": 25,
+      "actual_rps": 21.759401186501606
+    },
+    {
+      "timestamp_sec": 30,
+      "actual_rps": 21.79955683026933
+    }
+  ],
+  "memory_time_series": [
+    {
+      "timestamp_sec": 0,
+      "memory_mb": 13.26953125
+    },
+    {
+      "timestamp_sec": 5,
+      "memory_mb": 13.171875
+    },
+    {
+      "timestamp_sec": 10,
+      "memory_mb": 13.6640625
+    },
+    {
+      "timestamp_sec": 15,
+      "memory_mb": 13.93359375
+    },
+    {
+      "timestamp_sec": 20,
+      "memory_mb": 13.75390625
+    },
+    {
+      "timestamp_sec": 25,
+      "memory_mb": 14.05859375
+    },
+    {
+      "timestamp_sec": 0,
+      "memory_mb": 13.67578125
+    },
+    {
+      "timestamp_sec": 5,
+      "memory_mb": 13.59765625
+    },
+    {
+      "timestamp_sec": 10,
+      "memory_mb": 13.8515625
+    },
+    {
+      "timestamp_sec": 15,
+      "memory_mb": 13.71484375
+    },
+    {
+      "timestamp_sec": 20,
+      "memory_mb": 13.89453125
+    },
+    {
+      "timestamp_sec": 25,
+      "memory_mb": 14.1484375
+    },
+    {
+      "timestamp_sec": 0,
+      "memory_mb": 13.78125
+    },
+    {
+      "timestamp_sec": 5,
+      "memory_mb": 13.76953125
+    },
+    {
+      "timestamp_sec": 10,
+      "memory_mb": 13.7421875
+    },
+    {
+      "timestamp_sec": 15,
+      "memory_mb": 13.66796875
+    },
+    {
+      "timestamp_sec": 20,
+      "memory_mb": 13.921875
+    },
+    {
+      "timestamp_sec": 25,
+      "memory_mb": 13.6328125
+    },
+    {
+      "timestamp_sec": 30,
+      "memory_mb": 13.890625
+    },
+    {
+      "timestamp_sec": 35,
+      "memory_mb": 13.7265625
+    },
+    {
+      "timestamp_sec": 40,
+      "memory_mb": 13.7265625
+    },
+    {
+      "timestamp_sec": 45,
+      "memory_mb": 13.82421875
+    },
+    {
+      "timestamp_sec": 50,
+      "memory_mb": 13.82421875
+    },
+    {
+      "timestamp_sec": 55,
+      "memory_mb": 13.7109375
+    },
+    {
+      "timestamp_sec": 0,
+      "memory_mb": 13.7109375
+    },
+    {
+      "timestamp_sec": 5,
+      "memory_mb": 13.9453125
+    },
+    {
+      "timestamp_sec": 10,
+      "memory_mb": 13.9453125
+    },
+    {
+      "timestamp_sec": 15,
+      "memory_mb": 13.9453125
+    },
+    {
+      "timestamp_sec": 20,
+      "memory_mb": 14.16015625
+    },
+    {
+      "timestamp_sec": 25,
+      "memory_mb": 14.16015625
+    }
+  ],
+  "false_positive_count": 0,
+  "false_positive_rate": 0,
+  "collateral_count": 0,
+  "false_positive_details": null,
+  "scoring": {
+    "PERF-01": {
+      "pass": false,
+      "weighted": 0,
+      "max_points": 10,
+      "measured": 546.768,
+      "threshold": 5,
+      "explanation": "p99 latency 546.768ms \u003e 5ms ✗"
+    },
+    "PERF-02": {
+      "pass": false,
+      "weighted": 0,
+      "max_points": 5,
+      "measured": 30.566666666666666,
+      "threshold": 5000,
+      "explanation": "actual throughput 30.6 RPS \u003c 5000 RPS ✗"
+    },
+    "PERF-03": {
+      "pass": true,
+      "weighted": 3,
+      "max_points": 3,
+      "measured": 14.16015625,
+      "threshold": 100,
+      "explanation": "peak RSS 14.2 MB \u003c 100 MB ✓"
+    },
+    "PERF-04": {
+      "pass": true,
+      "weighted": 2,
+      "max_points": 2,
+      "measured": 0,
+      "threshold": 0.05,
+      "explanation": "no crash ✓ | error rate 0.00% \u003c 5% ✓"
+    }
+  },
+  "phase_c_total": 5,
+  "phase_c_max": 20,
+  "graceful_degradation": true
+}

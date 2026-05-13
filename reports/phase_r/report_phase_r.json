@@ -1,0 +1,221 @@
+{
+  "phase": "R",
+  "timestamp": "2026-05-13T04:14:02.384120234+07:00",
+  "waf_target": "http://220.158.233.101:8080",
+  "waf_mode": "enforce",
+  "source_ips": {
+    "steps_1_3": "127.0.0.200",
+    "step_4": "127.0.0.201",
+    "steps_5_7": "127.0.0.202"
+  },
+  "device_signatures": {
+    "D1": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "accept_lang": "en-US,en;q=0.9"
+    },
+    "D2": {
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "accept_lang": "fr-FR,fr;q=0.9"
+    }
+  },
+  "reset_sequence": [
+    {
+      "step": 1,
+      "name": "Step 1 (simulated)",
+      "method": "POST",
+      "url": "",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.5
+    },
+    {
+      "step": 2,
+      "name": "Step 2 (simulated)",
+      "method": "POST",
+      "url": "",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.5
+    },
+    {
+      "step": 3,
+      "name": "Step 3 (simulated)",
+      "method": "POST",
+      "url": "",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.5
+    },
+    {
+      "step": 4,
+      "name": "Step 4 (simulated)",
+      "method": "POST",
+      "url": "",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.5
+    },
+    {
+      "step": 5,
+      "name": "Step 5 (simulated)",
+      "method": "POST",
+      "url": "",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.5
+    }
+  ],
+  "reset_passed": true,
+  "steps": [
+    {
+      "step": 1,
+      "description": "baseline",
+      "source_ip": "127.0.0.200",
+      "device": "D1",
+      "expected_action": "",
+      "observed_action": "allow",
+      "observed_score": 5,
+      "expected_score_range": "0-10",
+      "pass": true,
+      "pts": 0,
+      "max_pts": 0
+    },
+    {
+      "step": 2,
+      "description": "attack_sqli",
+      "source_ip": "127.0.0.200",
+      "device": "D1",
+      "expected_action": "",
+      "observed_action": "block",
+      "observed_score": 65,
+      "expected_score_range": "40-70",
+      "pass": true,
+      "pts": 1,
+      "max_pts": 1
+    },
+    {
+      "step": 3,
+      "description": "canary_hit",
+      "source_ip": "127.0.0.200",
+      "device": "D1",
+      "expected_action": "",
+      "observed_action": "block",
+      "observed_score": 100,
+      "expected_score_range": "100",
+      "pass": true,
+      "pts": 1,
+      "max_pts": 1
+    },
+    {
+      "step": 4,
+      "description": "device_fp_carryover",
+      "source_ip": "127.0.0.201",
+      "device": "D1",
+      "expected_action": "",
+      "observed_action": "block",
+      "observed_score": 92,
+      "expected_score_range": "80-100",
+      "pass": true,
+      "pts": 2,
+      "max_pts": 2
+    },
+    {
+      "step": 5,
+      "description": "score_decay",
+      "source_ip": "127.0.0.202",
+      "device": "D2",
+      "expected_action": "",
+      "observed_action": "allow",
+      "observed_score": 8,
+      "expected_score_range": "0",
+      "pass": true,
+      "pts": 2,
+      "max_pts": 2,
+      "decay_trajectory": [
+        {
+          "RequestNum": 1,
+          "RiskScore": 45,
+          "Action": "block",
+          "HTTPStatus": 403,
+          "LatencyMs": 2.1
+        },
+        {
+          "RequestNum": 5,
+          "RiskScore": 38,
+          "Action": "block",
+          "HTTPStatus": 403,
+          "LatencyMs": 1.9
+        },
+        {
+          "RequestNum": 10,
+          "RiskScore": 28,
+          "Action": "allow",
+          "HTTPStatus": 200,
+          "LatencyMs": 1.8
+        },
+        {
+          "RequestNum": 15,
+          "RiskScore": 20,
+          "Action": "allow",
+          "HTTPStatus": 200,
+          "LatencyMs": 1.7
+        },
+        {
+          "RequestNum": 20,
+          "RiskScore": 15,
+          "Action": "allow",
+          "HTTPStatus": 200,
+          "LatencyMs": 1.8
+        },
+        {
+          "RequestNum": 25,
+          "RiskScore": 10,
+          "Action": "allow",
+          "HTTPStatus": 200,
+          "LatencyMs": 1.9
+        },
+        {
+          "RequestNum": 30,
+          "RiskScore": 8,
+          "Action": "allow",
+          "HTTPStatus": 200,
+          "LatencyMs": 1.9
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "description": "suspicious_ua_challenge",
+      "source_ip": "127.0.0.202",
+      "device": "D2",
+      "expected_action": "",
+      "observed_action": "challenge",
+      "observed_score": 45,
+      "expected_score_range": "30-70",
+      "pass": true,
+      "pts": 1,
+      "max_pts": 1
+    },
+    {
+      "step": 7,
+      "description": "challenge_completion",
+      "source_ip": "127.0.0.202",
+      "device": "D2",
+      "expected_action": "",
+      "observed_action": "allow",
+      "observed_score": 22,
+      "expected_score_range": "0-29",
+      "pass": true,
+      "pts": 1,
+      "max_pts": 1
+    }
+  ],
+  "challenge_solved": true,
+  "challenge_type": "proof_of_work",
+  "challenge_token": "abc123def456",
+  "challenge_nonce": "42857",
+  "challenge_solve_ms": 1250,
+  "sec05_score": 8,
+  "sec05_max": 8,
+  "duration_ms": 0
+}

@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAF Benchmark — Phase C: Performance & Throughput Report</title>
+<style>
+  :root {
+    --bg: #0b1120; --card: #111827; --card2: #1a2332;
+    --text: #e2e8f0; --muted: #94a3b8; --subtle: #64748b;
+    --green: #22c55e; --red: #ef4444; --yellow: #eab308;
+    --blue: #3b82f6; --purple: #8b5cf6; --orange: #f97316;
+    --border: #1e293b; --border2: #334155;
+    --code-bg: #0f172a; --pre-bg: #0f172a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7; padding: 0;
+  }
+  .container { max-width: 1400px; margin: 0 auto; padding: 20px 24px 60px; }
+
+  .main-header {
+    background: linear-gradient(135deg, var(--card) 0%, var(--card2) 100%);
+    border: 1px solid var(--border); border-radius: 16px; padding: 28px 32px;
+    margin-bottom: 24px;
+  }
+  .main-header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+  .main-header .subtitle { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+  .meta-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .meta-item { display: flex; flex-direction: column; }
+  .meta-item .lbl { font-size: 0.7rem; color: var(--subtle); text-transform: uppercase; letter-spacing: 0.05em; }
+  .meta-item .val { font-size: 0.95rem; font-weight: 600; word-break: break-all; }
+
+  .score-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 24px;
+    display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center;
+  }
+  .score-big { font-size: 3.2rem; font-weight: 800; line-height: 1; }
+  .score-info h3 { font-size: 1.1rem; margin-bottom: 4px; }
+  .progress-bar { height: 14px; border-radius: 7px; background: var(--border); margin: 10px 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 7px; transition: width 0.6s ease; }
+  .score-detail { font-size: 0.85rem; color: var(--muted); }
+
+  .section {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px 28px; margin-bottom: 24px;
+  }
+  .section h2 { font-size: 1.25rem; color: var(--blue); margin-bottom: 16px; }
+
+  .reset-steps { display: flex; flex-direction: column; gap: 6px; }
+  .reset-step {
+    display: flex; align-items: center; gap: 10px; padding: 6px 0;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem;
+  }
+  .reset-step .ok { color: var(--green); font-weight: 700; }
+  .reset-step .fail { color: var(--red); font-weight: 700; }
+  .step-num { color: var(--subtle); min-width: 40px; }
+  .reset-result { margin-top: 12px; padding: 8px 12px; border-radius: 6px; font-weight: 600; }
+  .reset-result.all-ok { background: rgba(34,197,94,0.1); color: var(--green); }
+  .reset-result.failed { background: rgba(239,68,68,0.1); color: var(--red); }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  th {
+    text-align: left; padding: 10px 12px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--subtle); background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--border2);
+  }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block; padding: 2px 10px; border-radius: 4px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+  }
+  .badge-pass { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge-fail { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-warn { background: rgba(234,179,8,0.15); color: var(--yellow); }
+
+  .vuln-card {
+    background: var(--card2); border: 1px solid var(--border2); border-radius: 12px;
+    margin: 16px 0; overflow: hidden;
+  }
+  .vuln-card-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+    background: rgba(0,0,0,0.15); cursor: pointer; user-select: none;
+    border-bottom: 1px solid transparent;
+  }
+  .vuln-card-header:hover { background: rgba(255,255,255,0.03); }
+  .vuln-id { font-weight: 800; font-size: 1rem; min-width: 40px; }
+  .vuln-name { font-weight: 600; flex: 1; }
+  .vuln-card-body { padding: 0; display: none; }
+  .vuln-card.open .vuln-card-header { border-bottom-color: var(--border2); }
+  .vuln-card.open .vuln-card-body { display: block; }
+
+  .vuln-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px; padding: 16px 20px; font-size: 0.85rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .vuln-meta .ml { color: var(--subtle); }
+  .vuln-meta .mv { font-weight: 600; }
+
+  .perf-row {
+    display: flex; gap: 16px; flex-wrap: wrap; margin: 8px 0;
+    font-size: 0.82rem; padding: 12px 20px;
+  }
+  .perf-item {
+    padding: 6px 14px; border-radius: 6px; background: rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .perf-item .pl { color: var(--subtle); }
+  .perf-item .pv { font-weight: 700; font-family: monospace; }
+  .perf-item.risk-in { border: 1px solid rgba(34,197,94,0.3); }
+  .perf-item.risk-out { border: 1px solid rgba(239,68,68,0.3); }
+
+  details {
+    margin: 8px 20px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--code-bg); overflow: hidden;
+  }
+  details summary {
+    padding: 10px 16px; cursor: pointer; font-size: 0.82rem; font-weight: 600;
+    color: var(--blue); background: rgba(59,130,246,0.06);
+    user-select: none; list-style: none;
+  }
+  details summary::-webkit-details-marker { display: none; }
+  details summary::before { content: '▶ '; font-size: 0.7rem; margin-right: 6px; }
+  details[open] summary::before { content: '▼ '; }
+  details summary:hover { background: rgba(59,130,246,0.1); }
+
+  pre {
+    margin: 0; padding: 14px 16px; font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.78rem; line-height: 1.5; overflow-x: auto;
+    background: var(--pre-bg); color: var(--text);
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 500px; overflow-y: auto;
+  }
+  pre.curl-cmd { border-left: 3px solid var(--orange); color: #fcd34d; }
+
+  .scoring-explain {
+    margin: 8px 20px 16px; padding: 12px 16px; border-radius: 8px;
+    font-size: 0.82rem; line-height: 1.7; white-space: pre-wrap;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .scoring-explain.pass { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); }
+  .scoring-explain.fail { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
+
+  .fail-reason {
+    padding: 10px 16px; margin: 8px 20px; border-radius: 6px;
+    background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+    color: var(--red); font-size: 0.85rem; font-weight: 600;
+  }
+
+  .methodology-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 12px; margin-top: 12px;
+  }
+  .method-card {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px;
+  }
+  .method-card h4 { font-size: 0.9rem; color: var(--blue); margin-bottom: 6px; }
+  .method-card p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+  .method-card code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 3px; font-size: 0.8rem; }
+
+  .footer {
+    text-align: center; padding: 32px; color: var(--subtle); font-size: 0.8rem;
+    border-top: 1px solid var(--border); margin-top: 32px;
+  }
+  .footer a { color: var(--blue); text-decoration: none; }
+
+  @media (max-width: 768px) {
+    .container { padding: 12px; }
+    .score-card { grid-template-columns: 1fr; text-align: center; }
+    .meta-grid { grid-template-columns: 1fr; }
+    .vuln-meta { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.vuln-card-header').forEach(function(hdr) {
+    hdr.addEventListener('click', function() {
+      this.parentElement.classList.toggle('open');
+    });
+  });
+  // Open first card by default
+  var first = document.querySelector('.vuln-card');
+  if (first) first.classList.add('open');
+});
+</script>
+</head>
+<body>
+<div class="container">
+
+<div class="main-header">
+<h1>⚡ WAF-BENCHMARK — PHASE C: PERFORMANCE &amp; THROUGHPUT REPORT</h1>
+<div class="subtitle">Performance evaluation under blended traffic load — Latency, Throughput, Memory, Graceful Degradation</div>
+<div class="meta-grid">
+<div class="meta-item"><span class="lbl">Timestamp</span><span class="val">2026-05-12T13:17:47+07:00</span></div>
+<div class="meta-item"><span class="lbl">WAF Target</span><span class="val">http://220.158.233.101:8080</span></div>
+<div class="meta-item"><span class="lbl">WAF Mode</span><span class="val">enforce</span></div>
+<div class="meta-item"><span class="lbl">Duration</span><span class="val">158269ms</span></div>
+<div class="meta-item"><span class="lbl">Traffic Mix</span><span class="val">60% Legit / 10% Suspicious / 10% Exploit / 10% Abuse / 10% DDoS</span></div>
+<div class="meta-item"><span class="lbl">Source IPs</span><span class="val">127.0.0.200–220 (21 loopback aliases)</span></div>
+<div class="meta-item"><span class="lbl">WAF PID</span><span class="val">937143</span></div>
+<div class="meta-item"><span class="lbl">Memory Monitor</span><span class="val"><span style="color:var(--green);">✅ enabled</span></span></div>
+</div>
+</div>
+<div class="score-card">
+<div class="score-big" style="color:var(--yellow);">5<span style="font-size:1.2rem;color:var(--muted);">/20</span></div>
+<div class="score-info">
+<h3>Phase C Total Score</h3>
+<div class="progress-bar"><div class="progress-fill" style="width:25.0%; background:var(--yellow);"></div></div>
+<div class="score-detail">2/4 criteria passed | 5 points from performance evaluation</div>
+</div>
+</div><div class="section" style="border-color:var(--blue);"><h2>📋 Executive Summary</h2><p style="color:var(--muted);margin-bottom:16px;">Phase C measures your WAF's <strong>performance under blended traffic load</strong> (60% legitimate user journeys + 10% suspicious-but-valid + 10% exploit payloads + 10% abuse patterns + 10% DDoS bursts). The benchmark tool sends traffic through your WAF at escalating rates (1K → 3K → 5K → 10K RPS) and measures latency, throughput, memory, and error rate.</p><div style="background:rgba(59,130,246,0.06);border:1px solid var(--border2);border-radius:8px;padding:16px;margin-bottom:16px;">
+<div style="display:flex;align-items:center;gap:16px;">
+<div style="font-size:2rem;font-weight:800;color:var(--yellow);">5<span style="font-size:1rem;color:var(--muted);">/20</span></div>
+<div><strong style="color:var(--yellow);">NEEDS IMPROVEMENT</strong><br><span style="color:var(--muted);font-size:0.85rem;">Phase C Performance Score</span></div>
+</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;"><div><strong style="color:var(--green);">PASSED</strong><ul style="list-style:none;padding:0;margin:8px 0 0;font-size:0.9rem;"><li style="margin:4px 0;"><span style="color:var(--green);">✅ PERF-03 (Memory < 100MB)</span></li><li style="margin:4px 0;"><span style="color:var(--green);">✅ PERF-04 (No crash + Error < 5%)</span></li></ul></div><div><strong style="color:var(--red);">FAILED</strong><ul style="list-style:none;padding:0;margin:8px 0 0;font-size:0.9rem;"><li style="margin:4px 0;"><span style="color:var(--red);">❌ PERF-01 (p99 Latency ≤ 5ms — measured: 546.8 ms, threshold: 5)</span></li><li style="margin:4px 0;"><span style="color:var(--red);">❌ PERF-02 (Throughput ≥ 5K RPS — measured: 30.6 RPS, threshold: 5000)</span></li></ul></div></div><p style="margin-top:12px;color:var(--yellow);font-size:0.85rem;">⚠️ Phase C is also <strong>Tiebreaker TB-02</strong> — the team with the lowest p99 latency at 5K RPS wins if security scores are tied.</p></div><div class="section"><h2>🔄 Full Reset Sequence (5 steps — §3.1)</h2><div class="reset-steps"><div class="reset-step"><span class="step-num">[1/5]</span><span class="ok">✓</span> Reset UPSTREAM — HTTP 200 (1.078ms)</div><div class="reset-step"><span class="step-num">[2/5]</span><span class="ok">✓</span> UPSTREAM health check — HTTP 200 (2.296ms)</div><div class="reset-step"><span class="step-num">[3/5]</span><span class="ok">✓</span> Set WAF profile (enforce) — HTTP 200 (2.142ms)</div><div class="reset-step"><span class="step-num">[4/5]</span><span class="ok">✓</span> Flush WAF cache — HTTP 200 (1.601ms)</div><div class="reset-step"><span class="step-num">[5/5]</span><span class="ok">✓</span> Reset WAF state — HTTP 200 (2.515ms)</div><div class="reset-result all-ok">✅ ALL 5/5 STEPS PASSED — Phase C continues</div></div></div>
+<div class="section"><h2>📐 Scoring Methodology (§5.2)</h2><div class="methodology-grid">
+<div class="method-card"><h4>PERF-01: p99 Latency (10 pts)</h4><p><code>Binary: p99 ≤ 5ms at 5000 RPS → 10; else 0</code><br>Measured at Step 3 (5000 RPS × 60s — SLA TARGET). WAF must add &lt;5ms overhead at p99 compared to baseline.</p></div>
+<div class="method-card"><h4>PERF-02: Sustained Throughput (5 pts)</h4><p><code>Binary: actual RPS ≥ 5000 at 5000 RPS target → 5; else 0</code><br>Measured at Step 3. WAF must sustain target throughput without dropping below 5000 RPS.</p></div>
+<div class="method-card"><h4>PERF-03: Memory Footprint (3 pts)</h4><p><code>Binary: Peak RSS &lt; 100MB → 3; else 0</code><br>Measured across all 4 load test steps via <code>/proc/{pid}/status</code> VmRSS sampling every 5s.</p></div>
+<div class="method-card"><h4>PERF-04: Graceful Degradation (2 pts)</h4><p><code>Binary: No crash AND Error rate &lt; 5% at 10000 RPS → 2; else 0</code><br>Measured at Step 4 (STRESS TEST). WAF must not crash and keep error rate under 5%.</p></div>
+</div></div>
+<div class="section"><h2>📊 Baseline Latency (Direct to UPSTREAM :9000)</h2>
+<p style="color:var(--muted);font-size:.85rem;margin-bottom:12px;">450 total samples — direct requests to UPSTREAM bypassing WAF. Used to compute WAF overhead.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Class</th><th>Endpoints</th><th>P50 (ms)</th><th>P99 (ms)</th><th>Avg (ms)</th><th>Samples</th></tr></thead><tbody><tr><td style="font-weight:600;">critical</td><td style="font-family:monospace;">/login, /deposit, /withdraw</td><td>0.693</td><td>2.964</td><td>0.817</td><td>150</td></tr><tr><td style="font-weight:600;">high</td><td style="font-family:monospace;">/api/profile, /game/list</td><td>0.676</td><td>1.694</td><td>0.765</td><td>100</td></tr><tr><td style="font-weight:600;">medium</td><td style="font-family:monospace;">/static/js/app.js, /static/css/style.css, /api/transactions</td><td>1.401</td><td>3.551</td><td>1.477</td><td>100</td></tr><tr><td style="font-weight:600;">catch_all</td><td style="font-family:monospace;">/health, /</td><td>0.710</td><td>2.578</td><td>0.811</td><td>100</td></tr></tbody></table></div></div>
+<div class="section"><h2>🛡️ WAF Latency (Through WAF-PROXY :8080)</h2>
+<p style="color:var(--muted);font-size:.85rem;margin-bottom:12px;">450 total samples — requests through WAF proxy. Overhead = WAF latency − Baseline latency.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Class</th><th>P50 (ms)</th><th>P99 (ms)</th><th>Avg (ms)</th><th>Overhead P50</th><th>Overhead P99</th><th>Overhead %</th></tr></thead><tbody><tr><td style="font-weight:600;">critical</td><td>14.006</td><td>20.619</td><td>14.741</td><td style="color:var(--red);font-weight:700;">13.312 ms</td><td style="color:var(--red);font-weight:700;">17.656 ms</td><td>1704.6%</td></tr><tr><td style="font-weight:600;">high</td><td>15.069</td><td>24.080</td><td>16.364</td><td style="color:var(--red);font-weight:700;">14.394 ms</td><td style="color:var(--red);font-weight:700;">22.386 ms</td><td>2038.5%</td></tr><tr><td style="font-weight:600;">medium</td><td>16.178</td><td>22.152</td><td>16.455</td><td style="color:var(--red);font-weight:700;">14.777 ms</td><td style="color:var(--red);font-weight:700;">18.601 ms</td><td>1013.9%</td></tr><tr><td style="font-weight:600;">catch_all</td><td>13.777</td><td>23.209</td><td>13.283</td><td style="color:var(--red);font-weight:700;">13.067 ms</td><td style="color:var(--red);font-weight:700;">20.631 ms</td><td>1538.6%</td></tr></tbody></table>
+<details style="margin:12px 0 0;"><summary>🔄 Reproduce — Baseline Measurement (Go)</summary>
+<pre class="curl-cmd">// Save as reproduce_baseline.go, then: go run reproduce_baseline.go
+// Mirrors benchmark tool's measureBaselineLatency() exactly.
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"sort"
+	"time"
+)
+
+func main() {
+	baseURL := "http://127.0.0.1:9000"
+	if v := os.Getenv("UPSTREAM_URL"); v != "" { baseURL = v }
+
+	type cls struct {
+		Name  string
+		EPs   []string
+		Samps int
+	}
+	classes := []cls{
+		{"critical", []string{"/login", "/deposit", "/withdraw"}, 150},
+		{"high", []string{"/api/profile", "/game/list"}, 100},
+		{"medium", []string{"/static/js/app.js", "/static/css/style.css", "/api/transactions"}, 100},
+		{"catch_all", []string{"/health", "/"}, 100},
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	for _, c := range classes {
+		var lats []float64
+		perEP := c.Samps / len(c.EPs)
+		for _, ep := range c.EPs {
+			for i := 0; i < perEP; i++ {
+				t0 := time.Now()
+				resp, _ := client.Get(baseURL + ep)
+				lats = append(lats, float64(time.Since(t0).Nanoseconds())/1e6)
+				if resp != nil { io.Copy(io.Discard, resp.Body); resp.Body.Close() }
+			}
+		}
+		sort.Float64s(lats)
+		n := len(lats)
+		sum := 0.0
+		for _, l := range lats { sum += l }
+		fmt.Printf("%-10s Samples:%-4d P50:%.3fms P99:%.3fms Avg:%.3fms\n",
+			c.Name, n, lats[n*50/100], lats[n*99/100], sum/float64(n))
+	}
+}</pre>
+</details>
+<details style="margin:8px 0 0;"><summary>🔄 Reproduce — WAF Latency Measurement (Go)</summary>
+<pre class="curl-cmd">// Save as reproduce_waf_latency.go, then: go run reproduce_waf_latency.go
+// Mirrors benchmark tool: baseline → WAF → overhead → PERF-01 check.
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"sort"
+	"time"
+)
+
+type cls struct {
+	Name  string
+	EPs   []string
+	Samps int
+}
+
+var classes = []cls{
+	{"critical", []string{"/login", "/deposit", "/withdraw"}, 150},
+	{"high", []string{"/api/profile", "/game/list"}, 100},
+	{"medium", []string{"/static/js/app.js", "/static/css/style.css", "/api/transactions"}, 100},
+	{"catch_all", []string{"/health", "/"}, 100},
+}
+
+func measure(client *http.Client, base string, c cls) (p50, p99, avg float64, n int) {
+	var lats []float64
+	perEP := c.Samps / len(c.EPs)
+	for _, ep := range c.EPs {
+		for i := 0; i < perEP; i++ {
+			t0 := time.Now()
+			resp, _ := client.Get(base + ep)
+			lats = append(lats, float64(time.Since(t0).Nanoseconds())/1e6)
+			if resp != nil { io.Copy(io.Discard, resp.Body); resp.Body.Close() }
+		}
+	}
+	n = len(lats)
+	if n == 0 { return }
+	sort.Float64s(lats)
+	p50, p99 = lats[n*50/100], lats[n*99/100]
+	sum := 0.0
+	for _, l := range lats { sum += l }
+	avg = sum / float64(n)
+	return
+}
+
+func main() {
+	wafURL := "http://127.0.0.1:8080"
+	upURL := "http://127.0.0.1:9000"
+	if v := os.Getenv("WAF_URL"); v != "" { wafURL = v }
+	if v := os.Getenv("UPSTREAM_URL"); v != "" { upURL = v }
+
+	client := &http.Client{Timeout: 10 * time.Second}
+
+	fmt.Println("=== BASELINE (Direct → UPSTREAM) ===")
+	type res struct {
+		Name          string
+		BP50, BP99, BAvg float64
+		WP50, WP99, WAvg float64
+	}
+	var results []res
+	for _, c := range classes {
+		bp50, bp99, bavg, _ := measure(client, upURL, c)
+		fmt.Printf("  %-10s P50:%.3fms P99:%.3fms Avg:%.3fms\n", c.Name, bp50, bp99, bavg)
+		results = append(results, res{Name: c.Name, BP50: bp50, BP99: bp99, BAvg: bavg})
+	}
+
+	fmt.Println("\n=== WAF LATENCY (Through WAF → UPSTREAM) ===")
+	for i, c := range classes {
+		wp50, wp99, wavg, _ := measure(client, wafURL, c)
+		results[i].WP50, results[i].WP99, results[i].WAvg = wp50, wp99, wavg
+		fmt.Printf("  %-10s P50:%.3fms P99:%.3fms Avg:%.3fms\n", c.Name, wp50, wp99, wavg)
+	}
+
+	fmt.Println("\n=== OVERHEAD (WAF − Baseline) ===")
+	totalOverhead := 0.0
+	for _, r := range results {
+		dP99 := r.WP99 - r.BP99
+		ovPct := 0.0
+		if r.BAvg > 0 { ovPct = (r.WAvg - r.BAvg) / r.BAvg * 100 }
+		fmt.Printf("  %-10s ΔP50:%+.3fms ΔP99:%+.3fms Overhead:%+.1f%%\n",
+			r.Name, r.WP50-r.BP50, dP99, ovPct)
+		totalOverhead += dP99
+	}
+	avgOv := totalOverhead / float64(len(results))
+	fmt.Printf("\n  Average ΔP99: %+.3fms\n", avgOv)
+	if avgOv <= 5.0 {
+		fmt.Println("  PERF-01: PASS ✓ (≤ 5ms)")
+	} else {
+		fmt.Println("  PERF-01: FAIL ✗ (> 5ms)")
+	}
+}</pre>
+</details>
+</div><div class="section"><h2>⚙️ Load Test Steps — Blended Traffic</h2>
+<p style="color:var(--muted);font-size:.85rem;margin-bottom:16px;">4 sequential load steps with blended traffic (60% Legit / 10% Suspicious / 10% Exploit / 10% Abuse / 10% DDoS). DDoS bursts every 10s for 2s at ≥1000 RPS. Memory sampled every 5s.</p><div style="margin-bottom:20px;">
+<details open><summary style="font-weight:700;font-size:0.95rem;cursor:pointer;color:var(--blue);">📊 Traffic Mix Details — What Each Type Means</summary>
+<div class="table-wrap" style="margin-top:12px;"><table>
+<thead><tr><th>Type</th><th>Ratio</th><th>Description</th><th>What the WAF should do</th></tr></thead>
+<tbody>
+<tr>
+<td style="font-weight:600;color:var(--green);">Legitimate<br>(Golden Path)</td>
+<td>60%</td>
+<td>Full user journey: GET / → GET /game/list → POST /login → POST /otp → GET /api/profile → GET /game/{id} → POST /game/{id}/play → POST /deposit → GET /api/transactions → POST /withdrawal</td>
+<td><strong>Allow (200)</strong> with low latency</td>
+</tr>
+<tr>
+<td style="font-weight:600;color:var(--yellow);">Suspicious<br>but Legitimate</td>
+<td>10%</td>
+<td>Same golden path, but with unusual User-Agent (<code>python-requests/2.28</code>, <code>Bot/1.0</code>) and faster timing (100–300 ms between requests). Credentials are valid.</td>
+<td>Allow or challenge; if blocked → counts as <strong style="color:var(--red);">false positive</strong></td>
+</tr>
+<tr>
+<td style="font-weight:600;color:var(--red);">Exploit<br>Payloads</td>
+<td>10%</td>
+<td>Active vulnerabilities from the catalogue: SQLi (V01, V02), XSS (V04), Path Traversal (V06, V07), SSRF (V08, V09), Malformed JSON (V14), Supply-chain (V20), Asymmetric DoS (V21), Race Condition (V24). Authenticated payloads include a full login-OTP flow first.</td>
+<td><strong>Block (403)</strong>, challenge, or rate-limit</td>
+</tr>
+<tr>
+<td style="font-weight:600;color:var(--orange);">Abuse<br>Patterns</td>
+<td>10%</td>
+<td>Failed login attempts (<code>admin</code> / wrong password) and random path scanning (<code>/api/invalid-path-{random}</code>).</td>
+<td><strong>Rate-limit (429)</strong> or block after threshold</td>
+</tr>
+<tr>
+<td style="font-weight:600;color:var(--purple);">DDoS<br>Bursts</td>
+<td>10%</td>
+<td>High-volume <code>GET /</code> and <code>GET /game/list</code> fired in burst windows: every 10 seconds, a 2-second burst of pure DDoS traffic is injected (only when target RPS ≥ 1,000).</td>
+<td>Rate-limit or drop; legitimate requests blocked inside burst windows are counted as <strong>collateral</strong>, not false positives</td>
+</tr>
+</tbody></table></div>
+</details></div>
+<div class="vuln-card">
+<div class="vuln-card-header">
+<span>✅</span><span class="vuln-id">Step 1</span><span class="vuln-name">1000 RPS × 30s</span>
+<span class="badge badge-pass" style="margin-left:auto;">PASS</span>
+</div>
+<div class="vuln-card-body">
+<div class="vuln-meta">
+<div><span class="ml">Target RPS:</span><span class="mv">1000</span></div>
+<div><span class="ml">Actual RPS:</span><span class="mv">49.8</span></div>
+<div><span class="ml">Total Requests:</span><span class="mv">1494</span></div>
+<div><span class="ml">Success Rate:</span><span class="mv">100.00%</span></div>
+<div><span class="ml">Error Rate:</span><span class="mv" style="color:var(--green);">0.00%</span></div>
+<div><span class="ml">Blocked Rate:</span><span class="mv">0.00%</span></div>
+<div><span class="ml">False Positives:</span><span class="mv">0</span></div>
+<div><span class="ml">Collateral Blocks:</span><span class="mv">0</span></div>
+</div>
+<div class="perf-row">
+<div class="perf-item"><span class="pl">⏱️ P50 Latency:</span><span class="pv">206.949ms</span></div>
+<div class="perf-item risk-out"><span class="pl">⏱️ P99 Latency:</span><span class="pv">343.020ms</span></div>
+<div class="perf-item"><span class="pl">⏱️ Max Latency:</span><span class="pv">415.414ms</span></div>
+<div class="perf-item risk-in"><span class="pl">💾 Memory Peak:</span><span class="pv">14.1 MB</span></div>
+<div class="perf-item"><span class="pl">⚡ DDoS Bursts:</span><span class="pv">3</span></div>
+</div><div class="scoring-explain pass">Step 1: 1000 RPS × 30s — Scoring Analysis
+
+  Actual Throughput: 49.8 RPS (target: 1000 RPS)
+  Total Requests:    1494
+  Success Rate:      100.00% (1494/1494)
+  Error Rate:        0.00% (0 errors)
+  Blocked Rate:      0.00% (0 blocked)
+
+  P50 Latency:       206.949 ms
+  P99 Latency:       343.020 ms
+  Max Latency:       415.414 ms
+
+  Memory Peak:       14.1 MB
+
+  False Positives:   0 (outside DDoS bursts)
+  Collateral Blocks: 0 (during DDoS bursts)
+
+
+  Step Result: PASS ✓ (error rate 0.00% < 5%)</div>
+<details style="margin-top:12px;"><summary>🔄 Reproduce — Step 1 Load Test</summary>
+<pre class="curl-cmd">// Save as reproduce_step1.go, then: go run reproduce_step1.go
+// Mirrors benchmark tool: blended traffic load test at 1000 RPS for 30s.
+package main
+
+import (
+	&#34;fmt&#34;
+	&#34;io&#34;
+	&#34;math/rand&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;sort&#34;
+	&#34;strings&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	wafURL := &#34;http://220.158.233.101:8080&#34;
+	if v := os.Getenv(&#34;WAF_URL&#34;); v != &#34;&#34; { wafURL = v }
+
+	targetRPS := 1000
+	durationSec := 30
+	fmt.Printf(&#34;=== STEP 1: %d RPS x %ds ===\n&#34;, targetRPS, durationSec)
+	fmt.Printf(&#34;WAF: %s\n\n&#34;, wafURL)
+
+	legitPaths := []string{&#34;/&#34;,&#34;/health&#34;,&#34;/game/list&#34;,&#34;/api/transactions&#34;,&#34;/api/profile&#34;,&#34;/user/settings&#34;}
+	abusePaths := []string{&#34;/admin/config&#34;,&#34;/wp-admin&#34;,&#34;/.env&#34;,&#34;/config.php&#34;}
+	exploits := []string{
+		`{&#34;username&#34;:&#34;admin&#39; OR 1=1--&#34;,&#34;password&#34;:&#34;x&#34;}`,
+		`{&#34;username&#34;:&#34;&lt;script&gt;alert(1)&lt;/script&gt;&#34;,&#34;password&#34;:&#34;x&#34;}`,
+	}
+
+	client := &amp;http.Client{Timeout: 10 * time.Second}
+	var (
+		ok, errs, blocked int64
+		lats              []float64
+		mu                sync.Mutex
+	)
+
+	interval := time.Second / time.Duration(targetRPS)
+	if interval &lt; 1 { interval = 1 }
+	deadline := time.Now().Add(time.Duration(durationSec) * time.Second)
+
+	var wg sync.WaitGroup
+	workers := 20
+	for w := 0; w &lt; workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for time.Now().Before(deadline) {
+				method, path, body := &#34;GET&#34;, &#34;/&#34;, &#34;&#34;
+				r := rand.Float64()
+				switch {
+				case r &lt; 0.60:
+					path = legitPaths[rand.Intn(len(legitPaths))]
+				case r &lt; 0.70:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = `{&#34;username&#34;:&#34;test&#34;,&#34;password&#34;:&#34;wrong&#34;}`
+				case r &lt; 0.80:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = exploits[rand.Intn(len(exploits))]
+				case r &lt; 0.90:
+					path = abusePaths[rand.Intn(len(abusePaths))]
+				}
+
+				t0 := time.Now()
+				var resp *http.Response
+				var err error
+				if method == &#34;POST&#34; {
+					resp, err = client.Post(wafURL+path, &#34;application/json&#34;, strings.NewReader(body))
+				} else {
+					resp, err = client.Get(wafURL + path)
+				}
+				lat := float64(time.Since(t0).Nanoseconds()) / 1e6
+
+				mu.Lock()
+				lats = append(lats, lat)
+				mu.Unlock()
+
+				if err != nil {
+					atomic.AddInt64(&amp;errs, 1)
+				} else {
+					if resp.StatusCode == 403 || resp.StatusCode == 429 {
+						atomic.AddInt64(&amp;blocked, 1)
+					}
+					atomic.AddInt64(&amp;ok, 1)
+					io.Copy(io.Discard, resp.Body)
+					resp.Body.Close()
+				}
+				time.Sleep(interval)
+			}
+		}()
+	}
+	wg.Wait()
+
+	mu.Lock()
+	sort.Float64s(lats)
+	n := len(lats)
+	p50, p99 := 0.0, 0.0
+	if n &gt; 0 { p50, p99 = lats[n*50/100], lats[n*99/100] }
+	mu.Unlock()
+
+	total := ok + errs
+	eRate := 0.0
+	if total &gt; 0 { eRate = float64(errs)/float64(total)*100 }
+
+	fmt.Println(&#34;\n=== RESULTS ===&#34;)
+	fmt.Printf(&#34;Total: %d  Success: %d  Errors: %d  Blocked: %d\n&#34;, total, ok, errs, blocked)
+	fmt.Printf(&#34;Error Rate: %.2f%%  P50: %.3fms  P99: %.3fms\n&#34;, eRate, p50, p99)
+	if eRate &lt; 5.0 { fmt.Println(&#34;PERF-04: PASS&#34;) } else { fmt.Println(&#34;PERF-04: FAIL&#34;) }
+}</pre>
+</details></div></div>
+<div class="vuln-card">
+<div class="vuln-card-header">
+<span>✅</span><span class="vuln-id">Step 2</span><span class="vuln-name">3000 RPS × 30s</span>
+<span class="badge badge-pass" style="margin-left:auto;">PASS</span>
+</div>
+<div class="vuln-card-body">
+<div class="vuln-meta">
+<div><span class="ml">Target RPS:</span><span class="mv">3000</span></div>
+<div><span class="ml">Actual RPS:</span><span class="mv">40.2</span></div>
+<div><span class="ml">Total Requests:</span><span class="mv">1206</span></div>
+<div><span class="ml">Success Rate:</span><span class="mv">100.00%</span></div>
+<div><span class="ml">Error Rate:</span><span class="mv" style="color:var(--green);">0.00%</span></div>
+<div><span class="ml">Blocked Rate:</span><span class="mv">0.00%</span></div>
+<div><span class="ml">False Positives:</span><span class="mv">0</span></div>
+<div><span class="ml">Collateral Blocks:</span><span class="mv">0</span></div>
+</div>
+<div class="perf-row">
+<div class="perf-item"><span class="pl">⏱️ P50 Latency:</span><span class="pv">255.229ms</span></div>
+<div class="perf-item risk-out"><span class="pl">⏱️ P99 Latency:</span><span class="pv">438.273ms</span></div>
+<div class="perf-item"><span class="pl">⏱️ Max Latency:</span><span class="pv">569.393ms</span></div>
+<div class="perf-item risk-in"><span class="pl">💾 Memory Peak:</span><span class="pv">14.1 MB</span></div>
+<div class="perf-item"><span class="pl">⚡ DDoS Bursts:</span><span class="pv">3</span></div>
+</div><div class="scoring-explain pass">Step 2: 3000 RPS × 30s — Scoring Analysis
+
+  Actual Throughput: 40.2 RPS (target: 3000 RPS)
+  Total Requests:    1206
+  Success Rate:      100.00% (1206/1206)
+  Error Rate:        0.00% (0 errors)
+  Blocked Rate:      0.00% (0 blocked)
+
+  P50 Latency:       255.229 ms
+  P99 Latency:       438.273 ms
+  Max Latency:       569.393 ms
+
+  Memory Peak:       14.1 MB
+
+  False Positives:   0 (outside DDoS bursts)
+  Collateral Blocks: 0 (during DDoS bursts)
+
+
+  Step Result: PASS ✓ (error rate 0.00% < 5%)</div>
+<details style="margin-top:12px;"><summary>🔄 Reproduce — Step 2 Load Test</summary>
+<pre class="curl-cmd">// Save as reproduce_step2.go, then: go run reproduce_step2.go
+// Mirrors benchmark tool: blended traffic load test at 3000 RPS for 30s.
+package main
+
+import (
+	&#34;fmt&#34;
+	&#34;io&#34;
+	&#34;math/rand&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;sort&#34;
+	&#34;strings&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	wafURL := &#34;http://220.158.233.101:8080&#34;
+	if v := os.Getenv(&#34;WAF_URL&#34;); v != &#34;&#34; { wafURL = v }
+
+	targetRPS := 3000
+	durationSec := 30
+	fmt.Printf(&#34;=== STEP 2: %d RPS x %ds ===\n&#34;, targetRPS, durationSec)
+	fmt.Printf(&#34;WAF: %s\n\n&#34;, wafURL)
+
+	legitPaths := []string{&#34;/&#34;,&#34;/health&#34;,&#34;/game/list&#34;,&#34;/api/transactions&#34;,&#34;/api/profile&#34;,&#34;/user/settings&#34;}
+	abusePaths := []string{&#34;/admin/config&#34;,&#34;/wp-admin&#34;,&#34;/.env&#34;,&#34;/config.php&#34;}
+	exploits := []string{
+		`{&#34;username&#34;:&#34;admin&#39; OR 1=1--&#34;,&#34;password&#34;:&#34;x&#34;}`,
+		`{&#34;username&#34;:&#34;&lt;script&gt;alert(1)&lt;/script&gt;&#34;,&#34;password&#34;:&#34;x&#34;}`,
+	}
+
+	client := &amp;http.Client{Timeout: 10 * time.Second}
+	var (
+		ok, errs, blocked int64
+		lats              []float64
+		mu                sync.Mutex
+	)
+
+	interval := time.Second / time.Duration(targetRPS)
+	if interval &lt; 1 { interval = 1 }
+	deadline := time.Now().Add(time.Duration(durationSec) * time.Second)
+
+	var wg sync.WaitGroup
+	workers := 20
+	for w := 0; w &lt; workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for time.Now().Before(deadline) {
+				method, path, body := &#34;GET&#34;, &#34;/&#34;, &#34;&#34;
+				r := rand.Float64()
+				switch {
+				case r &lt; 0.60:
+					path = legitPaths[rand.Intn(len(legitPaths))]
+				case r &lt; 0.70:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = `{&#34;username&#34;:&#34;test&#34;,&#34;password&#34;:&#34;wrong&#34;}`
+				case r &lt; 0.80:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = exploits[rand.Intn(len(exploits))]
+				case r &lt; 0.90:
+					path = abusePaths[rand.Intn(len(abusePaths))]
+				}
+
+				t0 := time.Now()
+				var resp *http.Response
+				var err error
+				if method == &#34;POST&#34; {
+					resp, err = client.Post(wafURL+path, &#34;application/json&#34;, strings.NewReader(body))
+				} else {
+					resp, err = client.Get(wafURL + path)
+				}
+				lat := float64(time.Since(t0).Nanoseconds()) / 1e6
+
+				mu.Lock()
+				lats = append(lats, lat)
+				mu.Unlock()
+
+				if err != nil {
+					atomic.AddInt64(&amp;errs, 1)
+				} else {
+					if resp.StatusCode == 403 || resp.StatusCode == 429 {
+						atomic.AddInt64(&amp;blocked, 1)
+					}
+					atomic.AddInt64(&amp;ok, 1)
+					io.Copy(io.Discard, resp.Body)
+					resp.Body.Close()
+				}
+				time.Sleep(interval)
+			}
+		}()
+	}
+	wg.Wait()
+
+	mu.Lock()
+	sort.Float64s(lats)
+	n := len(lats)
+	p50, p99 := 0.0, 0.0
+	if n &gt; 0 { p50, p99 = lats[n*50/100], lats[n*99/100] }
+	mu.Unlock()
+
+	total := ok + errs
+	eRate := 0.0
+	if total &gt; 0 { eRate = float64(errs)/float64(total)*100 }
+
+	fmt.Println(&#34;\n=== RESULTS ===&#34;)
+	fmt.Printf(&#34;Total: %d  Success: %d  Errors: %d  Blocked: %d\n&#34;, total, ok, errs, blocked)
+	fmt.Printf(&#34;Error Rate: %.2f%%  P50: %.3fms  P99: %.3fms\n&#34;, eRate, p50, p99)
+	if eRate &lt; 5.0 { fmt.Println(&#34;PERF-04: PASS&#34;) } else { fmt.Println(&#34;PERF-04: FAIL&#34;) }
+}</pre>
+</details></div></div>
+<div class="vuln-card">
+<div class="vuln-card-header">
+<span>✅</span><span class="vuln-id">Step 3</span><span class="vuln-name">5000 RPS × 60s <span class="badge badge-warn">⬤ SLA TARGET</span></span>
+<span class="badge badge-pass" style="margin-left:auto;">PASS</span>
+</div>
+<div class="vuln-card-body">
+<div class="vuln-meta">
+<div><span class="ml">Target RPS:</span><span class="mv">5000</span></div>
+<div><span class="ml">Actual RPS:</span><span class="mv">30.6</span></div>
+<div><span class="ml">Total Requests:</span><span class="mv">1834</span></div>
+<div><span class="ml">Success Rate:</span><span class="mv">100.00%</span></div>
+<div><span class="ml">Error Rate:</span><span class="mv" style="color:var(--green);">0.00%</span></div>
+<div><span class="ml">Blocked Rate:</span><span class="mv">0.00%</span></div>
+<div><span class="ml">False Positives:</span><span class="mv">0</span></div>
+<div><span class="ml">Collateral Blocks:</span><span class="mv">0</span></div>
+</div>
+<div class="perf-row">
+<div class="perf-item"><span class="pl">⏱️ P50 Latency:</span><span class="pv">346.302ms</span></div>
+<div class="perf-item risk-out"><span class="pl">⏱️ P99 Latency:</span><span class="pv">546.768ms</span></div>
+<div class="perf-item"><span class="pl">⏱️ Max Latency:</span><span class="pv">640.685ms</span></div>
+<div class="perf-item risk-in"><span class="pl">💾 Memory Peak:</span><span class="pv">13.9 MB</span></div>
+<div class="perf-item"><span class="pl">⚡ DDoS Bursts:</span><span class="pv">6</span></div>
+</div><div class="scoring-explain pass">Step 3: 5000 RPS × 60s — Scoring Analysis
+
+  Purpose: Evaluates PERF-01 & PERF-02
+
+  Actual Throughput: 30.6 RPS (target: 5000 RPS)
+  Total Requests:    1834
+  Success Rate:      100.00% (1834/1834)
+  Error Rate:        0.00% (0 errors)
+  Blocked Rate:      0.00% (0 blocked)
+
+  P50 Latency:       346.302 ms
+  P99 Latency:       546.768 ms
+  Max Latency:       640.685 ms
+
+  Memory Peak:       13.9 MB
+
+  False Positives:   0 (outside DDoS bursts)
+  Collateral Blocks: 0 (during DDoS bursts)
+
+── PERF-01 & PERF-02 Evaluation (SLA TARGET) ──
+  ✗ PERF-01 FAIL: p99 (546.768ms) > 5ms → 0 pts
+  ✗ PERF-02 FAIL: throughput (30.6 RPS) < 5000 RPS → 0 pts
+
+  Step Result: PASS ✓ (error rate 0.00% < 5%)</div>
+<details open><summary>📊 PERF-01 &amp; PERF-02 Evaluation</summary>
+<div style="padding:12px 16px;font-size:0.85rem;">
+<div style="margin:4px 0;"><strong>PERF-01</strong> — p99 Latency ≤ 5ms: measured → <span style="color:var(--red);font-weight:700;">FAIL ✗</span> (546.768ms vs threshold 5ms)</div>
+<div style="margin:4px 0;"><strong>PERF-02</strong> — Sustained Throughput ≥ 5000 RPS: measured → <span style="color:var(--red);font-weight:700;">FAIL ✗</span> (30.6 RPS vs threshold 5000 RPS)</div>
+<div style="margin-top:8px;color:var(--muted);font-size:0.8rem;">p99 latency 546.768ms &gt; 5ms ✗ | actual throughput 30.6 RPS &lt; 5000 RPS ✗</div>
+</div>
+</details>
+<details style="margin-top:12px;"><summary>🔄 Reproduce — Step 3 Load Test</summary>
+<pre class="curl-cmd">// Save as reproduce_step3.go, then: go run reproduce_step3.go
+// Mirrors benchmark tool: blended traffic load test at 5000 RPS for 60s.
+package main
+
+import (
+	&#34;fmt&#34;
+	&#34;io&#34;
+	&#34;math/rand&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;sort&#34;
+	&#34;strings&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	wafURL := &#34;http://220.158.233.101:8080&#34;
+	if v := os.Getenv(&#34;WAF_URL&#34;); v != &#34;&#34; { wafURL = v }
+
+	targetRPS := 5000
+	durationSec := 60
+	fmt.Printf(&#34;=== STEP 3: %d RPS x %ds ===\n&#34;, targetRPS, durationSec)
+	fmt.Printf(&#34;WAF: %s\n\n&#34;, wafURL)
+
+	legitPaths := []string{&#34;/&#34;,&#34;/health&#34;,&#34;/game/list&#34;,&#34;/api/transactions&#34;,&#34;/api/profile&#34;,&#34;/user/settings&#34;}
+	abusePaths := []string{&#34;/admin/config&#34;,&#34;/wp-admin&#34;,&#34;/.env&#34;,&#34;/config.php&#34;}
+	exploits := []string{
+		`{&#34;username&#34;:&#34;admin&#39; OR 1=1--&#34;,&#34;password&#34;:&#34;x&#34;}`,
+		`{&#34;username&#34;:&#34;&lt;script&gt;alert(1)&lt;/script&gt;&#34;,&#34;password&#34;:&#34;x&#34;}`,
+	}
+
+	client := &amp;http.Client{Timeout: 10 * time.Second}
+	var (
+		ok, errs, blocked int64
+		lats              []float64
+		mu                sync.Mutex
+	)
+
+	interval := time.Second / time.Duration(targetRPS)
+	if interval &lt; 1 { interval = 1 }
+	deadline := time.Now().Add(time.Duration(durationSec) * time.Second)
+
+	var wg sync.WaitGroup
+	workers := 20
+	for w := 0; w &lt; workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for time.Now().Before(deadline) {
+				method, path, body := &#34;GET&#34;, &#34;/&#34;, &#34;&#34;
+				r := rand.Float64()
+				switch {
+				case r &lt; 0.60:
+					path = legitPaths[rand.Intn(len(legitPaths))]
+				case r &lt; 0.70:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = `{&#34;username&#34;:&#34;test&#34;,&#34;password&#34;:&#34;wrong&#34;}`
+				case r &lt; 0.80:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = exploits[rand.Intn(len(exploits))]
+				case r &lt; 0.90:
+					path = abusePaths[rand.Intn(len(abusePaths))]
+				}
+
+				t0 := time.Now()
+				var resp *http.Response
+				var err error
+				if method == &#34;POST&#34; {
+					resp, err = client.Post(wafURL+path, &#34;application/json&#34;, strings.NewReader(body))
+				} else {
+					resp, err = client.Get(wafURL + path)
+				}
+				lat := float64(time.Since(t0).Nanoseconds()) / 1e6
+
+				mu.Lock()
+				lats = append(lats, lat)
+				mu.Unlock()
+
+				if err != nil {
+					atomic.AddInt64(&amp;errs, 1)
+				} else {
+					if resp.StatusCode == 403 || resp.StatusCode == 429 {
+						atomic.AddInt64(&amp;blocked, 1)
+					}
+					atomic.AddInt64(&amp;ok, 1)
+					io.Copy(io.Discard, resp.Body)
+					resp.Body.Close()
+				}
+				time.Sleep(interval)
+			}
+		}()
+	}
+	wg.Wait()
+
+	mu.Lock()
+	sort.Float64s(lats)
+	n := len(lats)
+	p50, p99 := 0.0, 0.0
+	if n &gt; 0 { p50, p99 = lats[n*50/100], lats[n*99/100] }
+	mu.Unlock()
+
+	total := ok + errs
+	eRate := 0.0
+	if total &gt; 0 { eRate = float64(errs)/float64(total)*100 }
+
+	fmt.Println(&#34;\n=== RESULTS ===&#34;)
+	fmt.Printf(&#34;Total: %d  Success: %d  Errors: %d  Blocked: %d\n&#34;, total, ok, errs, blocked)
+	fmt.Printf(&#34;Error Rate: %.2f%%  P50: %.3fms  P99: %.3fms\n&#34;, eRate, p50, p99)
+	if eRate &lt; 5.0 { fmt.Println(&#34;PERF-04: PASS&#34;) } else { fmt.Println(&#34;PERF-04: FAIL&#34;) }
+}</pre>
+</details></div></div>
+<div class="vuln-card">
+<div class="vuln-card-header">
+<span>✅</span><span class="vuln-id">Step 4</span><span class="vuln-name">10000 RPS × 30s <span class="badge badge-fail">⚡ STRESS TEST</span></span>
+<span class="badge badge-pass" style="margin-left:auto;">PASS</span>
+</div>
+<div class="vuln-card-body">
+<div class="vuln-meta">
+<div><span class="ml">Target RPS:</span><span class="mv">10000</span></div>
+<div><span class="ml">Actual RPS:</span><span class="mv">22.1</span></div>
+<div><span class="ml">Total Requests:</span><span class="mv">664</span></div>
+<div><span class="ml">Success Rate:</span><span class="mv">100.00%</span></div>
+<div><span class="ml">Error Rate:</span><span class="mv" style="color:var(--green);">0.00%</span></div>
+<div><span class="ml">Blocked Rate:</span><span class="mv">0.00%</span></div>
+<div><span class="ml">False Positives:</span><span class="mv">0</span></div>
+<div><span class="ml">Collateral Blocks:</span><span class="mv">0</span></div>
+</div>
+<div class="perf-row">
+<div class="perf-item"><span class="pl">⏱️ P50 Latency:</span><span class="pv">455.944ms</span></div>
+<div class="perf-item risk-out"><span class="pl">⏱️ P99 Latency:</span><span class="pv">890.350ms</span></div>
+<div class="perf-item"><span class="pl">⏱️ Max Latency:</span><span class="pv">1203.613ms</span></div>
+<div class="perf-item risk-in"><span class="pl">💾 Memory Peak:</span><span class="pv">14.2 MB</span></div>
+<div class="perf-item"><span class="pl">⚡ DDoS Bursts:</span><span class="pv">3</span></div>
+</div><div class="scoring-explain pass">Step 4: 10000 RPS × 30s — Scoring Analysis
+
+  Purpose: Evaluates PERF-04 (graceful degradation)
+
+  Actual Throughput: 22.1 RPS (target: 10000 RPS)
+  Total Requests:    664
+  Success Rate:      100.00% (664/664)
+  Error Rate:        0.00% (0 errors)
+  Blocked Rate:      0.00% (0 blocked)
+
+  P50 Latency:       455.944 ms
+  P99 Latency:       890.350 ms
+  Max Latency:       1203.613 ms
+
+  Memory Peak:       14.2 MB
+
+  False Positives:   0 (outside DDoS bursts)
+  Collateral Blocks: 0 (during DDoS bursts)
+
+── PERF-04 Evaluation (STRESS TEST) ──
+  ✓ PERF-04 PASS: no crash + error rate 0.00% < 5% → +2 pts
+
+  Step Result: PASS ✓ (error rate 0.00% < 5%)</div>
+<details open><summary>📊 PERF-04 Evaluation — Graceful Degradation</summary>
+<div style="padding:12px 16px;font-size:0.85rem;">
+<div style="margin:4px 0;"><strong>PERF-04</strong> — No Crash + Error &lt; 5% at 10k RPS: → <span style="color:var(--green);font-weight:700;">PASS ✓</span></div>
+<div style="margin:4px 0;">Crash detected: <span style="color:var(--green);">false</span> | Error rate: 0.00% (threshold: 5%)</div>
+<div style="margin-top:8px;color:var(--muted);font-size:0.8rem;">no crash ✓ | error rate 0.00% &lt; 5% ✓</div>
+</div>
+</details>
+<details style="margin-top:12px;"><summary>🔄 Reproduce — Step 4 Load Test</summary>
+<pre class="curl-cmd">// Save as reproduce_step4.go, then: go run reproduce_step4.go
+// Mirrors benchmark tool: blended traffic load test at 10000 RPS for 30s.
+package main
+
+import (
+	&#34;fmt&#34;
+	&#34;io&#34;
+	&#34;math/rand&#34;
+	&#34;net/http&#34;
+	&#34;os&#34;
+	&#34;sort&#34;
+	&#34;strings&#34;
+	&#34;sync&#34;
+	&#34;sync/atomic&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	wafURL := &#34;http://220.158.233.101:8080&#34;
+	if v := os.Getenv(&#34;WAF_URL&#34;); v != &#34;&#34; { wafURL = v }
+
+	targetRPS := 10000
+	durationSec := 30
+	fmt.Printf(&#34;=== STEP 4: %d RPS x %ds ===\n&#34;, targetRPS, durationSec)
+	fmt.Printf(&#34;WAF: %s\n\n&#34;, wafURL)
+
+	legitPaths := []string{&#34;/&#34;,&#34;/health&#34;,&#34;/game/list&#34;,&#34;/api/transactions&#34;,&#34;/api/profile&#34;,&#34;/user/settings&#34;}
+	abusePaths := []string{&#34;/admin/config&#34;,&#34;/wp-admin&#34;,&#34;/.env&#34;,&#34;/config.php&#34;}
+	exploits := []string{
+		`{&#34;username&#34;:&#34;admin&#39; OR 1=1--&#34;,&#34;password&#34;:&#34;x&#34;}`,
+		`{&#34;username&#34;:&#34;&lt;script&gt;alert(1)&lt;/script&gt;&#34;,&#34;password&#34;:&#34;x&#34;}`,
+	}
+
+	client := &amp;http.Client{Timeout: 10 * time.Second}
+	var (
+		ok, errs, blocked int64
+		lats              []float64
+		mu                sync.Mutex
+	)
+
+	interval := time.Second / time.Duration(targetRPS)
+	if interval &lt; 1 { interval = 1 }
+	deadline := time.Now().Add(time.Duration(durationSec) * time.Second)
+
+	var wg sync.WaitGroup
+	workers := 20
+	for w := 0; w &lt; workers; w++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for time.Now().Before(deadline) {
+				method, path, body := &#34;GET&#34;, &#34;/&#34;, &#34;&#34;
+				r := rand.Float64()
+				switch {
+				case r &lt; 0.60:
+					path = legitPaths[rand.Intn(len(legitPaths))]
+				case r &lt; 0.70:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = `{&#34;username&#34;:&#34;test&#34;,&#34;password&#34;:&#34;wrong&#34;}`
+				case r &lt; 0.80:
+					method = &#34;POST&#34;; path = &#34;/login&#34;
+					body = exploits[rand.Intn(len(exploits))]
+				case r &lt; 0.90:
+					path = abusePaths[rand.Intn(len(abusePaths))]
+				}
+
+				t0 := time.Now()
+				var resp *http.Response
+				var err error
+				if method == &#34;POST&#34; {
+					resp, err = client.Post(wafURL+path, &#34;application/json&#34;, strings.NewReader(body))
+				} else {
+					resp, err = client.Get(wafURL + path)
+				}
+				lat := float64(time.Since(t0).Nanoseconds()) / 1e6
+
+				mu.Lock()
+				lats = append(lats, lat)
+				mu.Unlock()
+
+				if err != nil {
+					atomic.AddInt64(&amp;errs, 1)
+				} else {
+					if resp.StatusCode == 403 || resp.StatusCode == 429 {
+						atomic.AddInt64(&amp;blocked, 1)
+					}
+					atomic.AddInt64(&amp;ok, 1)
+					io.Copy(io.Discard, resp.Body)
+					resp.Body.Close()
+				}
+				time.Sleep(interval)
+			}
+		}()
+	}
+	wg.Wait()
+
+	mu.Lock()
+	sort.Float64s(lats)
+	n := len(lats)
+	p50, p99 := 0.0, 0.0
+	if n &gt; 0 { p50, p99 = lats[n*50/100], lats[n*99/100] }
+	mu.Unlock()
+
+	total := ok + errs
+	eRate := 0.0
+	if total &gt; 0 { eRate = float64(errs)/float64(total)*100 }
+
+	fmt.Println(&#34;\n=== RESULTS ===&#34;)
+	fmt.Printf(&#34;Total: %d  Success: %d  Errors: %d  Blocked: %d\n&#34;, total, ok, errs, blocked)
+	fmt.Printf(&#34;Error Rate: %.2f%%  P50: %.3fms  P99: %.3fms\n&#34;, eRate, p50, p99)
+	if eRate &lt; 5.0 { fmt.Println(&#34;PERF-04: PASS&#34;) } else { fmt.Println(&#34;PERF-04: FAIL&#34;) }
+}</pre>
+</details></div></div></div>
+<div class="section"><h2>🔍 False Positive Analysis</h2>
+<div class="perf-row" style="margin-bottom:16px;">
+<div class="perf-item"><span class="pl">Total Legitimate Requests:</span><span class="pv">5198</span></div>
+<div class="perf-item risk-in"><span class="pl">False Positives:</span><span class="pv">0</span></div>
+<div class="perf-item"><span class="pl">Collaterals (DDoS):</span><span class="pv">0</span></div>
+<div class="perf-item risk-in"><span class="pl">FP Rate:</span><span class="pv">0.000%</span></div>
+</div>
+<details style="margin-top:12px;"><summary>🧪 How BTC Validates False Positives</summary>
+<pre class="curl-cmd"># Replay a legitimate request through WAF and check if blocked
+curl -s -o /dev/null -w "HTTP %%{http_code} | WAF-Action: %%header{X-WAF-Action}" \
+  --interface 127.0.0.200 \
+  http://127.0.0.1:8080/game/list
+# Expected: HTTP 200 with X-WAF-Action: allow (or absent)
+# False Positive if: HTTP 403 or X-WAF-Action: block on legitimate endpoint</pre>
+</details>
+</div>
+<div class="section"><h2>🏆 Scoring Summary — Phase C</h2>
+<div class="table-wrap"><table>
+<thead><tr><th>Criterion</th><th>Description</th><th>Measured</th><th>Threshold</th><th>Result</th><th>Points</th></tr></thead><tbody><tr><td style="font-weight:700;">PERF-01</td><td>p99 Latency ≤ 5ms at 5000 RPS</td><td>546.768 ms</td><td>≤5 ms</td><td><span class="badge badge-fail">FAIL</span></td><td style="font-weight:700;">0 / 10</td></tr><tr><td style="font-weight:700;">PERF-02</td><td>Sustained Throughput ≥ 5000 RPS</td><td>30.6 RPS</td><td>5000 RPS</td><td><span class="badge badge-fail">FAIL</span></td><td style="font-weight:700;">0 / 5</td></tr><tr><td style="font-weight:700;">PERF-03</td><td>Memory Peak < 100MB</td><td>14.2 MB</td><td>100 MB</td><td><span class="badge badge-pass">PASS</span></td><td style="font-weight:700;">3 / 3</td></tr><tr><td style="font-weight:700;">PERF-04</td><td>No Crash + Error < 5% at 10000 RPS</td><td>0.00%</td><td><5%</td><td><span class="badge badge-pass">PASS</span></td><td style="font-weight:700;">2 / 2</td></tr><tr style="background:rgba(59,130,246,0.06);"><td colspan="5" style="font-weight:700;text-align:right;">PHASE C TOTAL</td><td style="font-weight:800;font-size:1.1rem;color:var(--yellow);">5 / 20</td></tr></tbody></table></div></div><div class="section" style="border-color:var(--red);"><h2>🔴 PERF-01 — Why did it fail?</h2><p>Your WAF added <strong style="color:var(--red);">546.8 ms</strong> of p99 latency at 5,000 RPS. The threshold is <strong>5 ms</strong>. This means 99% of requests through your WAF were delayed by more than <strong>109×</strong> the allowed overhead.</p><div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 16px;margin:12px 0;"><strong>Key observations from the data:</strong><ul style="margin:8px 0 0;padding-left:20px;"><li>The low-concurrency latency measurement (450 samples, sequential) shows acceptable WAF overhead (~13–21 ms), but under <strong>real blended load</strong> at Step 3 (5,000 RPS, 60s), p99 latency ballooned to <strong>546.8 ms</strong> — a degradation of <strong>two orders of magnitude</strong>.</li><li>Worst endpoint class for overhead: <strong>high</strong> (ΔP99 = 22.4 ms).</li><li>Step 3 actual throughput was only <strong>30.6 RPS</strong> (target: 5,000) — the WAF could not keep up with the request rate. P50: 346.3 ms, Max: 640.7 ms.</li><li>This pattern typically indicates: <strong>synchronous rule evaluation</strong>, lack of connection pooling, unbounded internal queueing under mixed traffic, or blocking I/O in the WAF request path.</li></ul></div><p style="color:var(--muted);font-size:0.85rem;"><strong>How to fix:</strong> Profile your WAF under load to identify the bottleneck. Consider async rule evaluation, connection pooling to upstream, bounded queues with early rejection, and non-blocking I/O.</p></div><div class="section" style="border-color:var(--red);"><h2>🔴 PERF-02 — Why did it fail?</h2><p>Your WAF sustained only <strong style="color:var(--red);">30.6 RPS</strong> out of a 5,000 RPS target. The benchmark tool attempted to generate 5,000 RPS, but the WAF could only process ~<strong>0.6%</strong> of that rate.</p><div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:12px 16px;margin:12px 0;"><strong>Key observations from the data:</strong><ul style="margin:8px 0 0;padding-left:20px;"><li>Step 1 (1000 RPS target): actual = <strong>49.8 RPS</strong> (5.0% of target) — warm-up</li><li>Step 2 (3000 RPS target): actual = <strong>40.2 RPS</strong> (1.3% of target) — worse than Step 1</li><li>Step 3 (5000 RPS target): actual = <strong>30.6 RPS</strong> (0.6% of target) — SLA target failed</li><li>Step 4 (10000 RPS target): actual = <strong>22.1 RPS</strong> (0.2% of target) — stress test</li><li>The throughput curve is <strong>inverse to the target</strong>: higher target RPS → lower actual RPS. This suggests the WAF is bottlenecked by a <strong>shared resource</strong> (single-threaded worker, lock contention, or upstream connection limit) that collapses under load.</li><li>Notably, <strong>error rate is 0.00%</strong> across all steps — requests are not rejected, they are simply <strong>queued or processed very slowly</strong>.</li></ul></div><p style="color:var(--muted);font-size:0.85rem;"><strong>How to fix:</strong> Increase WAF worker pool size, remove lock contention, implement connection pooling to upstream, and add backpressure to shed excess load gracefully.</p></div><div class="section"><h2>📈 Time Series Data</h2><details open><summary>Throughput (RPS) over time</summary><pre>T+  5s:     62.6 RPS
+T+ 10s:     55.0 RPS
+T+ 15s:     51.4 RPS
+T+ 20s:     51.0 RPS
+T+ 25s:     50.6 RPS
+T+ 30s:     49.5 RPS
+T+  5s:     42.4 RPS
+T+ 10s:     43.2 RPS
+T+ 15s:     42.7 RPS
+T+ 20s:     42.2 RPS
+T+ 25s:     40.9 RPS
+T+ 30s:     39.9 RPS
+T+  5s:     30.4 RPS
+T+ 10s:     29.6 RPS
+T+ 15s:     29.3 RPS
+T+ 20s:     29.6 RPS
+T+ 25s:     30.2 RPS
+T+ 30s:     30.5 RPS
+T+ 35s:     30.6 RPS
+T+ 40s:     30.4 RPS
+T+ 45s:     30.5 RPS
+T+ 50s:     30.5 RPS
+T+ 55s:     30.4 RPS
+T+ 60s:     30.4 RPS
+T+  5s:     28.4 RPS
+T+ 10s:     23.4 RPS
+T+ 15s:     22.1 RPS
+T+ 20s:     21.8 RPS
+T+ 25s:     21.8 RPS
+T+ 30s:     21.8 RPS
+</pre></details><details open><summary>Memory (MB) over time</summary><pre>T+  0s:     13.3 MB
+T+  5s:     13.2 MB
+T+ 10s:     13.7 MB
+T+ 15s:     13.9 MB
+T+ 20s:     13.8 MB
+T+ 25s:     14.1 MB
+T+  0s:     13.7 MB
+T+  5s:     13.6 MB
+T+ 10s:     13.9 MB
+T+ 15s:     13.7 MB
+T+ 20s:     13.9 MB
+T+ 25s:     14.1 MB
+T+  0s:     13.8 MB
+T+  5s:     13.8 MB
+T+ 10s:     13.7 MB
+T+ 15s:     13.7 MB
+T+ 20s:     13.9 MB
+T+ 25s:     13.6 MB
+T+ 30s:     13.9 MB
+T+ 35s:     13.7 MB
+T+ 40s:     13.7 MB
+T+ 45s:     13.8 MB
+T+ 50s:     13.8 MB
+T+ 55s:     13.7 MB
+T+  0s:     13.7 MB
+T+  5s:     13.9 MB
+T+ 10s:     13.9 MB
+T+ 15s:     13.9 MB
+T+ 20s:     14.2 MB
+T+ 25s:     14.2 MB
+</pre></details></div>
+<div class="footer">
+WAF Benchmark Tool v2.7 | Phase C — Performance &amp; Throughput Tests<br>
+Report generated: 2026-05-12T13:17:47+07:00 | Duration: 158269ms<br>
+Scoring per <a href="#">phase_C.md §5.2</a> | <a href="#">VN_waf_interop_contract_v2.3.md</a>
+</div>
+</div></body></html>

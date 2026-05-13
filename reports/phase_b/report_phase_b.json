@@ -1,0 +1,3784 @@
+{
+  "phase": "B",
+  "timestamp": "2026-05-12T13:11:30+07:00",
+  "waf_target": "http://220.158.233.101:8080",
+  "waf_mode": "enforce",
+  "duration_ms": 16464,
+  "pre_check_passed": false,
+  "pre_check_alive": 0,
+  "pre_check_total": 30,
+  "pre_check_warning": true,
+  "reset_sequence": [
+    {
+      "step": 1,
+      "name": "Reset UPSTREAM",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.06193
+    },
+    {
+      "step": 2,
+      "name": "UPSTREAM health check",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.675279
+    },
+    {
+      "step": 3,
+      "name": "Set WAF profile (enforce)",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 2.576545
+    },
+    {
+      "step": 4,
+      "name": "Flush WAF cache",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.634742
+    },
+    {
+      "step": 5,
+      "name": "Reset WAF state",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.656069
+    }
+  ],
+  "categories": [
+    {
+      "id": "brute_force",
+      "name": "Brute Force \u0026 Credential Attacks",
+      "criterion": "SEC-03",
+      "max_score": 10,
+      "ip_range": "127.0.0.10–19",
+      "passed": 0,
+      "total": 3,
+      "score": 0
+    },
+    {
+      "id": "relay",
+      "name": "Relay \u0026 Proxy Detection",
+      "criterion": "INT-03",
+      "max_score": 4,
+      "ip_range": "127.0.0.20–39",
+      "passed": 2,
+      "total": 6,
+      "score": 1.3333333333333333
+    },
+    {
+      "id": "behavioral",
+      "name": "Behavioral Anomaly",
+      "criterion": "INT-02",
+      "max_score": 4,
+      "ip_range": "127.0.0.40–59",
+      "passed": 0,
+      "total": 5,
+      "score": 0
+    },
+    {
+      "id": "transaction",
+      "name": "Transaction Fraud",
+      "criterion": "INT-01",
+      "max_score": 4,
+      "ip_range": "127.0.0.60–79",
+      "passed": 0,
+      "total": 4,
+      "score": 0
+    },
+    {
+      "id": "recon",
+      "name": "Recon \u0026 Enumeration",
+      "criterion": "SEC-03+SEC-04",
+      "max_score": 12,
+      "ip_range": "127.0.0.80–99",
+      "passed": 1,
+      "total": 4,
+      "score": 0
+    }
+  ],
+  "tests": [
+    {
+      "test_id": "AB01",
+      "name": "Brute Force Login",
+      "category": "brute_force",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.10",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "50× POST /login with wrong passwords",
+      "pass_criterion": "WAF blocks within ≤10 attempts",
+      "total_requests": 50,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Not detected — no block within 50 attempts",
+      "result": "FAIL",
+      "avg_latency_ms": 5.670660000000002,
+      "max_latency_ms": 13.431,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF (Full Reset Sequence)",
+      "action_sequence_summary": "allow(1-50)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 12,
+          "score": 0
+        },
+        {
+          "request": 25,
+          "score": 0
+        },
+        {
+          "request": 37,
+          "score": 0
+        },
+        {
+          "request": 50,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-1\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 13.431,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:37 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "7b6a7d2d-4b3f-48bb-8147-b4e471ad2ca2",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-1\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-2\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 5.174,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:37 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "3699dc98-9827-4a9b-bb62-d6dd00a321c1",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-2\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-3\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 7.235,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:37 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "e83fef1c-f2e4-444d-b7bf-b7e1123845b0",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-3\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 48,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-48\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 6.553,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f6d287f5-72d4-42a9-8584-6773df1e2c8a",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-48\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 49,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-49\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 4.433,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "6f4084dc-1983-44af-a3d2-e43a92c67c35",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-49\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 50,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"wrong-50\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 5.94,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "b5c732b6-eab8-4ebc-9d82-dbd4440f09fa",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"wrong-50\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AB01: Brute Force Login — 50× POST /login with wrong passwords\nfor i in $(seq 1 5); do\n  curl -s --interface 127.0.0.10 -X POST http://220.158.233.101:8080/login \\\n    -H 'Content-Type: application/json' \\\n    -d \"{\\\"username\\\":\\\"alice\\\",\\\"password\\\":\\\"wrong-$i\\\"}\" -w \"attempt $i: %{http_code}\\n\"\ndone\n# Pass: WAF blocks within first 10 attempts"
+    },
+    {
+      "test_id": "AB02",
+      "name": "Credential Stuffing",
+      "category": "brute_force",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.11",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "100 credential pairs from file — stuffing attack",
+      "pass_criterion": "WAF blocks within ≤20 pairs",
+      "total_requests": 100,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Not detected — no block within 100 attempts",
+      "result": "FAIL",
+      "avg_latency_ms": 4.75899,
+      "max_latency_ms": 22.132,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-100)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 25,
+          "score": 0
+        },
+        {
+          "request": 50,
+          "score": 0
+        },
+        {
+          "request": 75,
+          "score": 0
+        },
+        {
+          "request": 100,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 3.594,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "01824c13-23c1-4ab1-9d15-3a974e613578",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 3.742,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f6e9ecd9-ecbb-4fd8-8107-7757766d36e4",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 3.587,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:38 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "3ba30b5c-bf08-4dc0-a058-65e00dcf488c",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 98,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 3.765,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a1411c25-4721-4610-81e3-a442b44309ad",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 99,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 4.799,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "801211c9-dcb2-4cfe-8cc8-ae9bcb3d657d",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 100,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 4.057,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a47916f3-1b4f-4e1e-8af7-1adbce0df301",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AB02: Credential Stuffing — 100 credential pairs\n# Generate test credentials file:\nfor i in $(seq 1 10); do\n  echo \"{\\\"username\\\":\\\"user_$i\\\",\\\"password\\\":\\\"Spring2024!\\\"}\" \u003e\u003e /tmp/creds.json\ndone\n# Send stuffing attack:\nwhile IFS= read -r line; do\n  curl -s --interface 127.0.0.11 -X POST http://220.158.233.101:8080/login \\\n    -H 'Content-Type: application/json' -d \"$line\" -w \" %{http_code}\\n\"\ndone \u003c /tmp/creds.json\n# Pass: WAF blocks within ≤20 pairs"
+    },
+    {
+      "test_id": "AB03",
+      "name": "Password Spraying",
+      "category": "brute_force",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.12",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "50 users, same password — spraying attack",
+      "pass_criterion": "WAF blocks within ≤15 users",
+      "total_requests": 50,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Not detected — no block within 50 attempts",
+      "result": "FAIL",
+      "avg_latency_ms": 5.922859999999999,
+      "max_latency_ms": 8.94,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-50)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 12,
+          "score": 0
+        },
+        {
+          "request": 25,
+          "score": 0
+        },
+        {
+          "request": 37,
+          "score": 0
+        },
+        {
+          "request": 50,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_1\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 5.223,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "5ac9b17f-013f-4ca3-a521-861499870778",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_1\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_2\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 5.833,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "399199ae-7e80-4036-9eeb-b010993f2c9d",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_2\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_3\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 5.068,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "075888af-db47-444d-9bd1-954b314971a2",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_3\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 48,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_48\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 7.989,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a2b84728-bee6-40f9-9e03-8990b4d3c148",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_48\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 49,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_49\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 8.002,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "6c7270c7-81a7-413f-8ebf-4f26428910d2",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_49\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 50,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"user_50\",\"password\":\"Spring2024!\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 401,
+          "latency_ms": 8.731,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "2da6d4c1-d13c-4dbc-acbe-03adb0090956",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"user_50\",\"password\":\"Spring2024!\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AB03: Password Spraying — 50 users, same password\nfor i in $(seq 1 10); do\n  curl -s --interface 127.0.0.12 -X POST http://220.158.233.101:8080/login \\\n    -H 'Content-Type: application/json' \\\n    -d \"{\\\"username\\\":\\\"user_$i\\\",\\\"password\\\":\\\"Spring2024!\\\"}\" -w \"user_$i: %{http_code}\\n\"\ndone\n# Pass: WAF blocks within ≤15 users"
+    },
+    {
+      "test_id": "AR01",
+      "name": "XFF Matches Source",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.0.20",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "X-Forwarded-For matches TCP source — negative control, should pass through",
+      "pass_criterion": "WAF must allow (HTTP 200), not blocked",
+      "negative_control": true,
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": true,
+      "result": "PASS",
+      "avg_latency_ms": 4.419,
+      "max_latency_ms": 4.419,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF",
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "pass_conditions_met": [
+        "P1",
+        "P5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "request_headers": {
+            "X-Forwarded-For": "127.0.0.20"
+          },
+          "status_code": 200,
+          "latency_ms": 4.419,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "127.0.0.20, 220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a717fc61-d608-4e8f-83bf-0e29bdf13cd9",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -H 'X-Forwarded-For: 127.0.0.20' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "negative_control_result": {
+        "expected_action": "allow",
+        "actual_action": "allow",
+        "expected_status": 200,
+        "actual_status": 200,
+        "false_positive": false,
+        "risk_score_expected": 0,
+        "risk_score_actual": 0
+      },
+      "reproduce_script": "# AR01: XFF Matches Source (negative control — MUST return 200)\ncurl -is --interface 127.0.0.20 http://220.158.233.101:8080/game/list \\\n  -H 'X-Forwarded-For: 127.0.0.20' | head -5\n# Pass = HTTP 200; block here = FALSE POSITIVE"
+    },
+    {
+      "test_id": "AR02",
+      "name": "XFF Spoofed",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.0.21",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "X-Forwarded-For ≠ TCP source (spoofed 8.8.8.8)",
+      "pass_criterion": "Risk score \u003e 0 or challenge/block",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Risk score not elevated",
+      "result": "FAIL",
+      "avg_latency_ms": 4.035,
+      "max_latency_ms": 4.035,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "request_headers": {
+            "X-Forwarded-For": "8.8.8.8"
+          },
+          "status_code": 200,
+          "latency_ms": 4.035,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "8.8.8.8, 220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "430013c3-88be-468e-a4d9-9aa69c5828b9",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -H 'X-Forwarded-For: 8.8.8.8' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AR02: XFF Spoofed — X-Forwarded-For differs from TCP source\ncurl -is --interface 127.0.0.21 http://220.158.233.101:8080/game/list \\\n  -H 'X-Forwarded-For: 8.8.8.8' | grep -i x-waf-risk-score\n# Pass: X-WAF-Risk-Score present and \u003e 0"
+    },
+    {
+      "test_id": "AR03",
+      "name": "XFF Multi-hop",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.0.22",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "X-Forwarded-For with 3+ hops — potential proxy chain",
+      "pass_criterion": "Risk score \u003e 0 or challenge/block",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Risk score not elevated",
+      "result": "FAIL",
+      "avg_latency_ms": 4.489,
+      "max_latency_ms": 4.489,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "request_headers": {
+            "X-Forwarded-For": "1.1.1.1, 2.2.2.2, 3.3.3.3, 4.4.4.4"
+          },
+          "status_code": 200,
+          "latency_ms": 4.489,
+          "response_body": "[{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"},{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "1.1.1.1, 2.2.2.2, 3.3.3.3, 4.4.4.4, 220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "86c91e75-c808-4b55-91d9-44d7edc4860f",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -H 'X-Forwarded-For: 1.1.1.1, 2.2.2.2, 3.3.3.3, 4.4.4.4' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AR03: XFF Multi-hop — 3+ proxy hops in X-Forwarded-For\ncurl -is --interface 127.0.0.22 http://220.158.233.101:8080/game/list \\\n  -H 'X-Forwarded-For: 1.1.1.1, 2.2.2.2, 3.3.3.3, 4.4.4.4' | grep -i x-waf-risk-score\n# Pass: X-WAF-Risk-Score \u003e 0"
+    },
+    {
+      "test_id": "AR06",
+      "name": "Clean IP",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.0.23",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "Clean IP, not in any threat intel list — negative control",
+      "pass_criterion": "WAF must allow (HTTP 200), not blocked",
+      "negative_control": true,
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": true,
+      "result": "PASS",
+      "avg_latency_ms": 4.045,
+      "max_latency_ms": 4.045,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "pass_conditions_met": [
+        "P1",
+        "P5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.045,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "3aa2e885-03d4-4082-a06f-a64ac38dcde5",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "negative_control_result": {
+        "expected_action": "allow",
+        "actual_action": "allow",
+        "expected_status": 200,
+        "actual_status": 200,
+        "false_positive": false,
+        "risk_score_expected": 0,
+        "risk_score_actual": 0
+      },
+      "reproduce_script": "# AR06: Clean IP (negative control — MUST return 200)\ncurl -is --interface 127.0.0.23 http://220.158.233.101:8080/game/list | head -5\n# Pass = HTTP 200; block here = FALSE POSITIVE"
+    },
+    {
+      "test_id": "AR04",
+      "name": "Tor Exit Node Detection",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.1.1",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "Request from Tor exit node IP — should trigger threat-intel lookup",
+      "pass_criterion": "Risk score \u003e baseline or challenge",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Risk score not elevated",
+      "result": "FAIL",
+      "avg_latency_ms": 4.608,
+      "max_latency_ms": 4.608,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF (relay sub-phase)",
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.608,
+          "response_body": "[{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"},{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "64bc3970-4619-4e56-a8cd-29cf6c25ab7d",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AR04: Tor Exit Node Detection — bind IP from tor_exit_nodes.txt\nTOR_IP=$(head -1 /var/www/WAF-BENCHMARK/shared/tor_exit_nodes.txt)\ncurl -is --interface $TOR_IP http://220.158.233.101:8080/game/list | grep -i x-waf-risk-score\n# Fallback (if loopback alias not available):\n# curl --socks5-hostname \u003cproxy\u003e --proxy-user \u003cuser:pass\u003e http://220.158.233.101:8080/game/list\n# Pass: X-WAF-Risk-Score \u003e baseline"
+    },
+    {
+      "test_id": "AR05",
+      "name": "Datacenter IP Detection",
+      "category": "relay",
+      "criterion": "INT-03",
+      "source_ip": "127.0.2.1",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "Request from datacenter IP to CRITICAL route — should trigger threat-intel lookup",
+      "pass_criterion": "Risk score \u003e baseline or challenge",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Risk score not elevated",
+      "result": "FAIL",
+      "avg_latency_ms": 5.664,
+      "max_latency_ms": 5.664,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 5.664,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:40 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "450d9a9e-f454-4d69-b1c7-909ae640058b",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# AR05: Datacenter IP Detection — bind IP from datacenter_asns.txt\nDC_IP=$(head -1 /var/www/WAF-BENCHMARK/shared/datacenter_asns.txt)\ncurl -is --interface $DC_IP -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}' | grep -i x-waf-risk-score\n# Pass: X-WAF-Risk-Score \u003e baseline"
+    },
+    {
+      "test_id": "BA01",
+      "name": "Zero-Depth Session",
+      "category": "behavioral",
+      "criterion": "INT-02",
+      "source_ip": "127.0.0.40",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "POST /login without prior GET / — zero-depth session bot behavior",
+      "pass_criterion": "Risk \u003e 30 or challenge",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Zero-depth session not flagged (risk \u003c= 30)",
+      "result": "FAIL",
+      "avg_latency_ms": 4.845,
+      "max_latency_ms": 4.845,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF",
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 400,
+          "latency_ms": 4.845,
+          "response_body": "{\"error\":\"invalid_credentials\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "32",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:41 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "ef21dee5-9cd5-47c5-a186-375610f2b340",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# BA01: Zero-Depth Session — POST /login without prior GET /\ncurl -is --interface 127.0.0.40 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}' | grep -i x-waf\n# Pass: X-WAF-Risk-Score \u003e 30 or X-WAF-Action: challenge"
+    },
+    {
+      "test_id": "BA02",
+      "name": "Uniform Timing Bot",
+      "category": "behavioral",
+      "criterion": "INT-02",
+      "source_ip": "127.0.0.41",
+      "endpoint": "/game/list",
+      "method": "GET",
+      "description": "100 identical GET /game/list at exactly 100ms intervals — bot timing",
+      "pass_criterion": "Block/challenge within ≤60 requests",
+      "total_requests": 100,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Uniform timing not detected — no block within 100 requests",
+      "result": "FAIL",
+      "avg_latency_ms": 5.38411,
+      "max_latency_ms": 23.972,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-100)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 25,
+          "score": 0
+        },
+        {
+          "request": 50,
+          "score": 0
+        },
+        {
+          "request": 75,
+          "score": 0
+        },
+        {
+          "request": 100,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.606,
+          "response_body": "[{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"},{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:41 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "c194c01e-4a9c-4b5a-9d19-fe8deac74e59",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.466,
+          "response_body": "[{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"},{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:41 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "bfa9e997-7e69-40a7-abbf-79cd9d944c2e",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.499,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:41 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "54b6b2cc-1065-4cc9-a604-d881037ff177",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 98,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.164,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f6149605-4f8e-436a-b487-8de75feece25",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 99,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.017,
+          "response_body": "[{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"},{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "4faea859-2c34-44de-a02e-e55099935e97",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 100,
+          "url": "http://220.158.233.101:8080/game/list",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 3.903,
+          "response_body": "[{\"id\":3,\"name\":\"Roulette\",\"status\":\"active\",\"description\":\"Place your bets on the spinning wheel\"},{\"id\":4,\"name\":\"Poker\",\"status\":\"active\",\"description\":\"Texas Hold'em poker against the house\"},{\"id\":5,\"name\":\"Dice\",\"status\":\"active\",\"description\":\"Roll the dice and test your luck\"},{\"id\":1,\"name\":\"Slots\",\"status\":\"active\",\"description\":\"Classic slot machine game with multiple paylines\"},{\"id\":2,\"name\":\"Blackjack\",\"status\":\"active\",\"description\":\"Beat the dealer to 21 without going bust\"}]\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "497",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "aaee1ee8-dc44-4210-aebf-0ca1c84d66fd",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/game/list' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# BA02: Uniform Timing Bot — 100× GET /game/list at 100ms intervals\nfor i in $(seq 1 100); do\n  curl -s --interface 127.0.0.41 -o /dev/null -w \"%{http_code}\\n\" \\\n    http://220.158.233.101:8080/game/list\n  sleep 0.1\ndone\n# Pass: HTTP transitions from 200 → 403/429 within ≤60 requests"
+    },
+    {
+      "test_id": "BA03",
+      "name": "Missing Referer",
+      "category": "behavioral",
+      "criterion": "INT-02",
+      "source_ip": "127.0.0.42",
+      "endpoint": "/deposit",
+      "method": "POST",
+      "description": "POST /deposit without Referer header (bob authenticated) — missing referer anomaly",
+      "pass_criterion": "Risk delta \u003e 0",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Missing Referer not detected (risk delta = 0)",
+      "result": "FAIL",
+      "avg_latency_ms": 12.609,
+      "max_latency_ms": 12.609,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "b306c96e...",
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":100,\"currency\":\"USD\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=b306c96e-d338-41ab-a4c9-d7a41157f615"
+          },
+          "status_code": 500,
+          "latency_ms": 12.609,
+          "response_body": "{\"error\":\"internal_error\",\"marker\":\"__V14_MALFORMED__\",\"message\":\"JSON parse error: invalid character '%' looking for beginning of value\",\"stack\":\"__L01_STACKTRACE__\\n  at internal/handler/deposit.go:47\\n  at internal/handler/router.go:128\\n  at net/http.(*ServeMux).ServeHTTP(mux.go:123)\\n  at main.go:31\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "308",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "fa2e8748-c2e8-4f1c-8b0e-ec10e2adbd5f",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=b306c96e-d338-41ab-a4c9-d7a41157f615' -d '{\"amount\":100,\"currency\":\"USD\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# BA03: Missing Referer — POST /deposit without Referer (bob auth)\nLT=$(curl -s --interface 127.0.0.42 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"bob\",\"password\":\"S3cureP@ss\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.42 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"654321\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\ncurl -is --interface 127.0.0.42 -X POST http://220.158.233.101:8080/deposit \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -d '{\"amount\":100,\"currency\":\"USD\"}' | grep -i x-waf\n# Pass: X-WAF-Risk-Score delta \u003e 0 (no Referer anomaly detected)"
+    },
+    {
+      "test_id": "BA04",
+      "name": "Sub-50ms Cadence Bot",
+      "category": "behavioral",
+      "criterion": "INT-02",
+      "source_ip": "127.0.0.43",
+      "endpoint": "/api/profile",
+      "method": "GET",
+      "description": "20× GET /api/profile in \u003c3s (sub-50ms cadence) — rapid authenticated scraping",
+      "pass_criterion": "Block/challenge (403/429)",
+      "total_requests": 20,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Rapid cadence not detected — no block or risk elevation",
+      "result": "FAIL",
+      "avg_latency_ms": 6.021649999999999,
+      "max_latency_ms": 11.601,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "5fc2b428...",
+      "f6_details": "Rate-limit not maintained",
+      "action_sequence_summary": "allow(1-20)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 5,
+          "score": 0
+        },
+        {
+          "request": 10,
+          "score": 0
+        },
+        {
+          "request": 15,
+          "score": 0
+        },
+        {
+          "request": 20,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F6",
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 11.601,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "d7ddddd1-da4d-4c87-a260-be10d0da3f64",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 4.541,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "20212678-d2eb-4399-88d6-ac879d7adeea",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 4.719,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "8d36d6a6-bfd7-41fe-81d9-b0cebc5d1eb5",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 18,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 5.878,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "49d796de-ff32-4096-87e6-ce76f42a4f52",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 19,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 5.216,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "74995ca5-7013-4fab-8ab6-845c71cef7e9",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 20,
+          "url": "http://220.158.233.101:8080/api/profile",
+          "method": "GET",
+          "request_headers": {
+            "Cookie": "sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe"
+          },
+          "status_code": 200,
+          "latency_ms": 4.28,
+          "response_body": "{\"user_id\":1,\"username\":\"alice\",\"email\":\"alice@example.com\",\"display_name\":\"alice\",\"balance\":10000,\"card_number\":\"__L04_PII__4111-XXXX-XXXX-0001\",\"bank_account\":\"__L04_PII__ACCT-000001\",\"ssn\":\"__L04_PII__000-00-0001\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "218",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:42 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "17b97ca1-2c44-45ab-a9ca-47849e376de4",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/profile' -H 'Cookie: sid=5fc2b428-ff0d-4e49-a52f-df2b8c961cfe' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# BA04: Sub-50ms Cadence — 20× GET /api/profile rapid fire (alice auth)\nLT=$(curl -s --interface 127.0.0.43 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.43 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"123456\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\nfor i in $(seq 1 20); do\n  curl -s --interface 127.0.0.43 -o /dev/null -w \"%{http_code}\\n\" \\\n    http://220.158.233.101:8080/api/profile -H \"Cookie: sid=$SID\" \u0026\ndone; wait\n# Pass: HTTP 403/429 on some requests (rapid cadence detected)"
+    },
+    {
+      "test_id": "BA05",
+      "name": "Spoofed Referer",
+      "category": "behavioral",
+      "criterion": "INT-02",
+      "source_ip": "127.0.0.44",
+      "endpoint": "/withdrawal",
+      "method": "POST",
+      "description": "POST /withdrawal with spoofed Referer: evil.com (charlie authenticated, v2.6: own login-OTP, NOT shared with BA03)",
+      "pass_criterion": "Risk \u003e 0 or challenge",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Spoofed Referer not flagged (risk = 0)",
+      "result": "FAIL",
+      "avg_latency_ms": 14.685,
+      "max_latency_ms": 14.685,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "2ad16add...",
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/withdrawal",
+          "method": "POST",
+          "request_body": "{\"amount\":50,\"bank_account\":\"ACCT-000003\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=2ad16add-d9a0-484c-b2f4-1ce104d0efaf",
+            "Referer": "https://evil.com/phishing"
+          },
+          "status_code": 200,
+          "latency_ms": 14.685,
+          "response_body": "{\"balance\":19950,\"status\":\"pending\",\"tx_id\":\"5587e477-d6a1-47fe-a695-80c608e1476d\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "84",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a2d31ce8-cf1d-4aa7-ac84-1735cfc10735",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/withdrawal' -H 'Content-Type: application/json' -H 'Referer: https://evil.com/phishing' -H 'Cookie: sid=2ad16add-d9a0-484c-b2f4-1ce104d0efaf' -d '{\"amount\":50,\"bank_account\":\"ACCT-000003\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# BA05: Spoofed Referer — POST /withdrawal with Referer: evil.com (charlie auth, v2.6: own login-OTP)\nLT=$(curl -s --interface 127.0.0.44 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"charlie\",\"password\":\"Ch@rlie99\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.44 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"111222\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\ncurl -is --interface 127.0.0.44 -X POST http://220.158.233.101:8080/withdrawal \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -H 'Referer: https://evil.com/phishing' \\\n  -d '{\"amount\":50,\"bank_account\":\"ACCT-000003\"}' | grep -i x-waf\n# Pass: X-WAF-Risk-Score \u003e 0 (spoofed Referer detected)"
+    },
+    {
+      "test_id": "TF01",
+      "name": "Rush Deposit (3× in \u003c5s)",
+      "category": "transaction",
+      "criterion": "INT-01",
+      "source_ip": "127.0.0.60",
+      "endpoint": "/deposit",
+      "method": "POST",
+      "description": "3× $1000 deposit in \u003c5 seconds — rush deposit fraud pattern",
+      "pass_criterion": "WAF blocks/challenges deposit (risk spike or block)",
+      "total_requests": 3,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Rush deposit not detected (risk \u003c 50, not blocked)",
+      "result": "FAIL",
+      "avg_latency_ms": 8.267000000000001,
+      "max_latency_ms": 13.3,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "9e1baea0...",
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF",
+      "action_sequence_summary": "allow(1-3)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 3,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=9e1baea0-69de-4caa-a805-dea3ce447135"
+          },
+          "status_code": 500,
+          "latency_ms": 13.3,
+          "response_body": "{\"error\":\"internal_error\",\"marker\":\"__V14_MALFORMED__\",\"message\":\"JSON parse error: invalid character '%' looking for beginning of value\",\"stack\":\"__L01_STACKTRACE__\\n  at internal/handler/deposit.go:47\\n  at internal/handler/router.go:128\\n  at net/http.(*ServeMux).ServeHTTP(mux.go:123)\\n  at main.go:31\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "308",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "5ca5deff-0307-4d65-b191-c96d3150860f",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Cookie: sid=9e1baea0-69de-4caa-a805-dea3ce447135' -H 'Content-Type: application/json' -d '{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=2)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=9e1baea0-69de-4caa-a805-dea3ce447135"
+          },
+          "status_code": 500,
+          "latency_ms": 6.085,
+          "response_body": "{\"error\":\"internal_error\",\"marker\":\"__V14_MALFORMED__\",\"message\":\"JSON parse error: invalid character '%' looking for beginning of value\",\"stack\":\"__L01_STACKTRACE__\\n  at internal/handler/deposit.go:47\\n  at internal/handler/router.go:128\\n  at net/http.(*ServeMux).ServeHTTP(mux.go:123)\\n  at main.go:31\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "308",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "8b952e53-adb8-4f2c-afda-e358e9616434",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=9e1baea0-69de-4caa-a805-dea3ce447135' -d '{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=2)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=3)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=9e1baea0-69de-4caa-a805-dea3ce447135"
+          },
+          "status_code": 500,
+          "latency_ms": 5.416,
+          "response_body": "{\"error\":\"internal_error\",\"marker\":\"__V14_MALFORMED__\",\"message\":\"JSON parse error: invalid character '%' looking for beginning of value\",\"stack\":\"__L01_STACKTRACE__\\n  at internal/handler/deposit.go:47\\n  at internal/handler/router.go:128\\n  at net/http.(*ServeMux).ServeHTTP(mux.go:123)\\n  at main.go:31\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "308",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "563d4158-8a64-4135-b4f0-569abd4be86e",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=9e1baea0-69de-4caa-a805-dea3ce447135' -d '{\"amount\":1000,\"currency\":\"USD\"}%!(EXTRA int=3)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# TF01: Rush Deposit — 3× $1000 deposit in \u003c5s (alice auth)\nLT=$(curl -s --interface 127.0.0.60 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"alice\",\"password\":\"P@ssw0rd1\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.60 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"123456\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\nfor i in 1 2 3; do\n  curl -s --interface 127.0.0.60 -X POST http://220.158.233.101:8080/deposit \\\n    -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n    -d '{\"amount\":1000,\"currency\":\"USD\"}' -w \"deposit $i: %{http_code}\\n\" \u0026\ndone; wait\n# Pass: WAF blocks/challenges one of the deposits"
+    },
+    {
+      "test_id": "TF02",
+      "name": "Instant Withdrawal (\u003c3s)",
+      "category": "transaction",
+      "criterion": "INT-01",
+      "source_ip": "127.0.0.61",
+      "endpoint": "/deposit",
+      "method": "POST",
+      "description": "Deposit → instant $500 withdrawal in \u003c3s — suspicious timing",
+      "pass_criterion": "WAF flags the withdrawal (risk spike or block)",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Instant withdrawal not flagged (risk \u003c 50, not blocked)",
+      "result": "FAIL",
+      "avg_latency_ms": 8.861,
+      "max_latency_ms": 12.862,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "c3834e38...",
+      "action_sequence_summary": "allow(1-2)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 2,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":500,\"currency\":\"USD\"}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=c3834e38-f8e2-4aac-91ff-ed34647037ac"
+          },
+          "status_code": 500,
+          "latency_ms": 12.862,
+          "response_body": "{\"error\":\"internal_error\",\"marker\":\"__V14_MALFORMED__\",\"message\":\"JSON parse error: invalid character '%' looking for beginning of value\",\"stack\":\"__L01_STACKTRACE__\\n  at internal/handler/deposit.go:47\\n  at internal/handler/router.go:128\\n  at net/http.(*ServeMux).ServeHTTP(mux.go:123)\\n  at main.go:31\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "308",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "d9afe403-ed72-4a35-872b-89dccd6f7928",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=c3834e38-f8e2-4aac-91ff-ed34647037ac' -d '{\"amount\":500,\"currency\":\"USD\"}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/withdrawal",
+          "method": "POST",
+          "request_body": "{\"amount\":500,\"bank_account\":\"ACCT-000002\"}",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=c3834e38-f8e2-4aac-91ff-ed34647037ac"
+          },
+          "status_code": 200,
+          "latency_ms": 4.86,
+          "response_body": "{\"balance\":4500,\"status\":\"pending\",\"tx_id\":\"30bb2deb-7afd-47e0-9ab0-c4cfa3f0ac9f\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "83",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "2f47edef-ccee-47dc-bb9f-99084aec30ba",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/withdrawal' -H 'Content-Type: application/json' -H 'Cookie: sid=c3834e38-f8e2-4aac-91ff-ed34647037ac' -d '{\"amount\":500,\"bank_account\":\"ACCT-000002\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# TF02: Instant Withdrawal — deposit then withdrawal in \u003c3s (bob auth)\nLT=$(curl -s --interface 127.0.0.61 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"bob\",\"password\":\"S3cureP@ss\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.61 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"654321\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\ncurl -s --interface 127.0.0.61 -X POST http://220.158.233.101:8080/deposit \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -d '{\"amount\":500,\"currency\":\"USD\"}' -w \"deposit: %{http_code}\\n\"\ncurl -s --interface 127.0.0.61 -X POST http://220.158.233.101:8080/withdrawal \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -d '{\"amount\":500,\"bank_account\":\"ACCT-000002\"}' -w \"withdrawal: %{http_code}\\n\"\n# Pass: WAF flags the withdrawal (risk spike or block)"
+    },
+    {
+      "test_id": "TF03",
+      "name": "Limit Change + Large Withdrawal",
+      "category": "transaction",
+      "criterion": "INT-01",
+      "source_ip": "127.0.0.62",
+      "endpoint": "/user/settings",
+      "method": "PUT",
+      "description": "Increase withdrawal_limit → large withdrawal $50000 in \u003c10s — fraud escalation",
+      "pass_criterion": "WAF detects suspicious limit change + withdrawal combo (risk spike or block)",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Limit change + large withdrawal not detected (risk \u003c 50, not blocked)",
+      "result": "FAIL",
+      "avg_latency_ms": 10.44,
+      "max_latency_ms": 14.74,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "d7d5d852...",
+      "action_sequence_summary": "allow(1-2)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 2,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/user/settings",
+          "method": "PUT",
+          "request_body": "{\"preferences\":{\"withdrawal_limit\":999999}}%!(EXTRA int=1)",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=d7d5d852-4299-4a5c-9749-4d53041c9ef4"
+          },
+          "status_code": 200,
+          "latency_ms": 14.74,
+          "response_body": "{\"updated\":true}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "17",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f34d1f8e-eecb-4a32-b24f-5b1c8cb3e1dd",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X PUT 'http://220.158.233.101:8080/user/settings' -H 'Content-Type: application/json' -H 'Cookie: sid=d7d5d852-4299-4a5c-9749-4d53041c9ef4' -d '{\"preferences\":{\"withdrawal_limit\":999999}}%!(EXTRA int=1)' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/withdrawal",
+          "method": "POST",
+          "request_body": "{\"amount\":50000,\"bank_account\":\"ACCT-000003\"}",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=d7d5d852-4299-4a5c-9749-4d53041c9ef4"
+          },
+          "status_code": 400,
+          "latency_ms": 6.14,
+          "response_body": "{\"error\":\"insufficient_balance\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "33",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "284a9b80-f9a0-470c-b63d-48d513f07e87",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/withdrawal' -H 'Content-Type: application/json' -H 'Cookie: sid=d7d5d852-4299-4a5c-9749-4d53041c9ef4' -d '{\"amount\":50000,\"bank_account\":\"ACCT-000003\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# TF03: Limit Change + Large Withdrawal (charlie auth)\nLT=$(curl -s --interface 127.0.0.62 -X POST http://220.158.233.101:8080/login \\\n  -H 'Content-Type: application/json' \\\n  -d '{\"username\":\"charlie\",\"password\":\"Ch@rlie99\"}' | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\nSID=$(curl -s --interface 127.0.0.62 -X POST http://220.158.233.101:8080/otp \\\n  -H 'Content-Type: application/json' \\\n  -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"111222\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\ncurl -s --interface 127.0.0.62 -X PUT http://220.158.233.101:8080/user/settings \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -d '{\"preferences\":{\"withdrawal_limit\":999999}}' -w \"limit change: %{http_code}\\n\"\ncurl -s --interface 127.0.0.62 -X POST http://220.158.233.101:8080/withdrawal \\\n  -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n  -d '{\"amount\":50000,\"bank_account\":\"ACCT-000003\"}' -w \"withdrawal: %{http_code}\\n\"\n# Pass: WAF detects suspicious limit change + withdrawal combo"
+    },
+    {
+      "test_id": "TF04",
+      "name": "Multi-Account Device",
+      "category": "transaction",
+      "criterion": "INT-01",
+      "source_ip": "127.0.0.63",
+      "endpoint": "/login",
+      "method": "POST",
+      "description": "5 different users login+deposit from same IP in \u003c60s — multi-accounting fraud",
+      "pass_criterion": "WAF detects multi-accounting pattern (risk spike or block)",
+      "total_requests": 15,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Multi-accounting not detected (risk \u003c 50, not blocked)",
+      "result": "FAIL",
+      "avg_latency_ms": 15.474799999999998,
+      "max_latency_ms": 0,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "auth_used": true,
+      "session_id": "multi (5 users)",
+      "action_sequence_summary": "allow(1-15)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 3,
+          "score": 0
+        },
+        {
+          "request": 7,
+          "score": 0
+        },
+        {
+          "request": 11,
+          "score": 0
+        },
+        {
+          "request": 15,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"testuser_1\",\"password\":\"Test#1Pass\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 200,
+          "latency_ms": 15.232,
+          "response_body": "{\"login_token\":\"af8856ef-0267-46b4-a65a-654f09bf0868\",\"user_id\":101}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "69",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Set-Cookie": "sid=ee5bb501-1c8e-4068-aac9-48bf3d5b21b3; Path=/; HttpOnly; SameSite=Strict",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "0d540b70-4e15-4ada-aebe-78e4ee5115a3",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"testuser_1\",\"password\":\"Test#1Pass\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/otp",
+          "method": "POST",
+          "request_body": "{\"login_token\":\"af8856ef-0267-46b4-a65a-654f09bf0868\",\"otp_code\":\"000001\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 200,
+          "latency_ms": 17.549,
+          "response_body": "{\"session_id\":\"2a559501-e6c5-4b34-944a-322aa2fbdf9a\",\"verified\":true}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "70",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Set-Cookie": "sid=2a559501-e6c5-4b34-944a-322aa2fbdf9a; Path=/; HttpOnly; SameSite=Strict",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f1033e38-e68f-4203-9263-50df6dca23a8",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/otp' -H 'Content-Type: application/json' -d '{\"login_token\":\"af8856ef-0267-46b4-a65a-654f09bf0868\",\"otp_code\":\"000001\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":100,\"currency\":\"USD\"}",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=2a559501-e6c5-4b34-944a-322aa2fbdf9a"
+          },
+          "status_code": 200,
+          "latency_ms": 12.582,
+          "response_body": "{\"balance\":1100,\"tx_id\":\"7f5c1ad1-3e0e-4bf1-b5c5-707b72093a6a\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "64",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "86435b93-7a6d-40bc-b5dd-9ab8593aeba4",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=2a559501-e6c5-4b34-944a-322aa2fbdf9a' -d '{\"amount\":100,\"currency\":\"USD\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 13,
+          "url": "http://220.158.233.101:8080/login",
+          "method": "POST",
+          "request_body": "{\"username\":\"testuser_5\",\"password\":\"Test#5Pass\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 200,
+          "latency_ms": 14.542,
+          "response_body": "{\"login_token\":\"8ce140ef-bbda-4d59-8748-971054eaa332\",\"user_id\":105}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "69",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Set-Cookie": "sid=046dedd4-3cb9-453f-9bc3-6014f6610f8b; Path=/; HttpOnly; SameSite=Strict",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "9a2ed298-d8aa-4631-b4a9-a533014b2685",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/login' -H 'Content-Type: application/json' -d '{\"username\":\"testuser_5\",\"password\":\"Test#5Pass\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 14,
+          "url": "http://220.158.233.101:8080/otp",
+          "method": "POST",
+          "request_body": "{\"login_token\":\"8ce140ef-bbda-4d59-8748-971054eaa332\",\"otp_code\":\"000005\"}",
+          "request_headers": {
+            "Content-Type": "application/json"
+          },
+          "status_code": 200,
+          "latency_ms": 17.43,
+          "response_body": "{\"session_id\":\"99669c83-1b2c-48a8-88a4-42b01bae8511\",\"verified\":true}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "70",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Set-Cookie": "sid=99669c83-1b2c-48a8-88a4-42b01bae8511; Path=/; HttpOnly; SameSite=Strict",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "76485024-4122-468f-bceb-35fb299d9a0b",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/otp' -H 'Content-Type: application/json' -d '{\"login_token\":\"8ce140ef-bbda-4d59-8748-971054eaa332\",\"otp_code\":\"000005\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 15,
+          "url": "http://220.158.233.101:8080/deposit",
+          "method": "POST",
+          "request_body": "{\"amount\":100,\"currency\":\"USD\"}",
+          "request_headers": {
+            "Content-Type": "application/json",
+            "Cookie": "sid=99669c83-1b2c-48a8-88a4-42b01bae8511"
+          },
+          "status_code": 200,
+          "latency_ms": 18.993,
+          "response_body": "{\"balance\":1100,\"tx_id\":\"b9a7357f-442c-45d0-b88d-75c626899972\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "64",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "e88b05f4-15bf-4c40-848e-c4f8ed342ad9",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X POST 'http://220.158.233.101:8080/deposit' -H 'Content-Type: application/json' -H 'Cookie: sid=99669c83-1b2c-48a8-88a4-42b01bae8511' -d '{\"amount\":100,\"currency\":\"USD\"}' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# TF04: Multi-Account Device — 5 users login+deposit from same IP\nfor n in $(seq 1 5); do\n  USER=\"testuser_$n\"; PASS=\"Test#${n}Pass\"; OTP=$(printf \"%06d\" $n)\n  LT=$(curl -s --interface 127.0.0.63 -X POST http://220.158.233.101:8080/login \\\n    -H 'Content-Type: application/json' \\\n    -d \"{\\\"username\\\":\\\"$USER\\\",\\\"password\\\":\\\"$PASS\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['login_token'])\")\n  SID=$(curl -s --interface 127.0.0.63 -X POST http://220.158.233.101:8080/otp \\\n    -H 'Content-Type: application/json' \\\n    -d \"{\\\"login_token\\\":\\\"$LT\\\",\\\"otp_code\\\":\\\"$OTP\\\"}\" | python3 -c \"import sys,json; print(json.load(sys.stdin)['session_id'])\")\n  curl -s --interface 127.0.0.63 -X POST http://220.158.233.101:8080/deposit \\\n    -H \"Cookie: sid=$SID\" -H 'Content-Type: application/json' \\\n    -d '{\"amount\":100,\"currency\":\"USD\"}' -w \"$USER deposit: %{http_code}\\n\"\ndone\n# Pass: WAF detects multi-accounting pattern from same IP"
+    },
+    {
+      "test_id": "RE01",
+      "name": "Path Enumeration",
+      "category": "recon",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.80",
+      "endpoint": "/",
+      "method": "GET",
+      "description": "200 requests to various paths — directory enumeration; also checks for __L05_VERBOSE_404__ markers",
+      "pass_criterion": "WAF blocks within ≤50 requests AND no __L05_VERBOSE_404__ markers",
+      "total_requests": 200,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "WAF did not block enumeration",
+      "result": "FAIL",
+      "avg_latency_ms": 6.101890000000001,
+      "max_latency_ms": 15.245,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "reset_before": true,
+      "reset_type": "UPSTREAM+WAF",
+      "action_sequence_summary": "allow(1-200)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 50,
+          "score": 0
+        },
+        {
+          "request": 100,
+          "score": 0
+        },
+        {
+          "request": 150,
+          "score": 0
+        },
+        {
+          "request": 200,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 15.245,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('ae4929d9-14f4-4ae4-84c7-a0d1f653d2d8');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-223e81b26a787ce5; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "ae4929d9-14f4-4ae4-84c7-a0d1f653d2d8",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 7.717,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('2677d046-698a-4945-bf57-34595222ede4');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-c43a1055216406e5; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "2677d046-698a-4945-bf57-34595222ede4",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 7.331,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('0aba63da-a45a-4d2f-b406-e19f2f165e99');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:43 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-615409a7e64813f6; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "0aba63da-a45a-4d2f-b406-e19f2f165e99",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 198,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 6.938,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('e0812550-d19d-419e-96a6-bbc9681b7717');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-37b971fd9a1818b2; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "e0812550-d19d-419e-96a6-bbc9681b7717",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 199,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 9.455,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('288741e9-a2bf-47b0-b9b4-74198cc7ac9b');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-1013e66eb529797d; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "288741e9-a2bf-47b0-b9b4-74198cc7ac9b",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 200,
+          "url": "http://220.158.233.101:8080/",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 9.065,
+          "response_body": "\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n  \u003cmeta charset=\"utf-8\"\u003e\n  \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\"\u003e\n  \u003ctitle\u003eNovaBet - Gaming Platform\u003c/title\u003e\n  \u003clink rel=\"stylesheet\" href=\"/static/css/style.css\"\u003e\n\u003cscript id=\"waf-identity-js\"\u003e(function(){\n  if(window.__wafIdentityInjected)return;window.__wafIdentityInjected=true;\n  function gc(n){var m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):'';}\n  function sc(n,v,d,h){var c=n+'='+encodeURIComponent(v)+'; Path=/; Max-Age='+d+'; SameSite=Lax';if(h)c+='; HttpOnly';document.cookie=c;}\n  function rnd(){return(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}\n  function send(uv,sid,fp){var q='?uv='+encodeURIComponent(uv)+'\u0026sid='+encodeURIComponent(sid)+'\u0026rid='+encodeURIComponent('9b7873e2-93a8-4895-934d-42ff5ad0b801');if(fp)q+='\u0026fp='+encodeURIComponent(fp);fetch('/__waf/ping'+q,{method:'GET',credentials:'include',keepalive:true,cache:'no-store'}).catch(function(){});}\n  function fallback(){var uv=gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,null);}\n  function handleFpResult(r){var uv=(r\u0026\u0026r.visitorId)||gc('waf_uv_id')||('uv-'+rnd());var sid=gc('waf_sid')||('sid-'+rnd());var fp=(r\u0026\u0026r.visitorId)||null;sc('waf_uv_id',uv,31536000,false);sc('waf_sid',sid,2592000,false);send(uv,sid,fp);}\n  if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);return;}\n  var s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js';\n  s.onload=function(){if(window.FingerprintJS\u0026\u0026window.FingerprintJS.load){window.FingerprintJS.load().then(function(fp){return fp.get();}).then(handleFpResult).catch(fallback);}else{fallback();}};\n  s.onerror=fallback;document.head.appendChild(s);\n})();\u003c/script\u003e\u003c/head\u003e\n\u003cbody\u003e\n  \u003cnav class=\"navbar\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003ca href=\"/\" class=\"logo\"\u003eNova\u003cspan\u003eBet\u003c/span\u003e\u003c/a\u003e\n      \u003cdiv class=\"nav-links\" id=\"nav-links\"\u003e\n        \u003ca href=\"http://127.0.0.1:9000/\" class=\"active\"\u003eHome\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"http://127.0.0.1:9000/public/faq.html\"\u003eFAQ\u003c/a\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"nav-user\" id=\"nav-user\"\u003e\n        \u003ca href=\"/#login\" class=\"nav-btn\"\u003eLogin\u003c/a\u003e\n        \u003ca href=\"https://127.0.0.1:9000/reset-password?token=demo\" class=\"nav-link-reset\"\u003eReset password\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/nav\u003e\n  \u003cmain id=\"app-content\"\u003e\n    \u003csection class=\"hero\"\u003e\n      \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"live-indicator\" id=\"live-indicator\" title=\"Connected to live notifications feed\"\u003e\n          \u003cspan class=\"live-dot\"\u003e\u003c/span\u003e LIVE\n        \u003c/div\u003e\n        \u003ch1\u003ePlay. Win. Withdraw.\u003c/h1\u003e\n        \u003cp\u003eThe premier gaming platform with instant payouts and secure transactions\u003c/p\u003e\n        \u003ca href=\"#login\" class=\"cta-btn\"\u003eLogin to Play\u003c/a\u003e\n        \u003cdiv class=\"live-stats\" id=\"live-stats\" data-endpoint=\"/api/public/stats\"\u003e\n          \u003cspan\u003eLoading live stats…\u003c/span\u003e\n        \u003c/div\u003e\n      \u003c/div\u003e\n    \u003c/section\u003e\n  \u003c/main\u003e\n  \u003cfooter class=\"footer\"\u003e\n    \u003cdiv class=\"container\"\u003e\n      \u003cp\u003e\u0026copy; 2026 NovaBet Gaming Platform\u003c/p\u003e\n      \u003cdiv class=\"footer-links\"\u003e\n        \u003ca href=\"/about\"\u003eAbout\u003c/a\u003e\n        \u003ca href=\"/public/terms.html\"\u003eTerms\u003c/a\u003e\n        \u003ca href=\"/public/faq.html\"\u003eFAQ\u003c/a\u003e\n        \u003ca href=\"/openapi.yaml\"\u003eAPI Docs\u003c/a\u003e\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/footer\u003e\n  \u003cscript src=\"/static/js/app.js\"\u003e\u003c/script\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+          "response_headers": {
+            "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, private",
+            "Connection": "keep-alive",
+            "Content-Type": "text/html",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "Expires": "0",
+            "Pragma": "no-cache",
+            "Set-Cookie": "waf_sid=sid-65015c7a03b3cd0c; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "9b7873e2-93a8-4895-934d-42ff5ad0b801",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# RE01: Path Enumeration — 200 requests to nonexistent paths\nPATHS=(/admin /config /backup /test /secret /db /api/v1 /admin.php /wp-admin /.git /env /.aws)\nfor i in $(seq 1 20); do\n  for p in \"${PATHS[@]}\"; do\n    curl -s --interface 127.0.0.80 -o /dev/null -w \"%{http_code}\\n\" http://220.158.233.101:8080${p}\n  done\ndone | sort | uniq -c\n# L05 check: grep '__L05_VERBOSE_404__' trong response bodies\n# Pass: WAF blocks (403) within ≤50 requests AND no __L05_VERBOSE_404__ markers"
+    },
+    {
+      "test_id": "RE02",
+      "name": "OPTIONS Abuse",
+      "category": "recon",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.81",
+      "endpoint": "/",
+      "method": "OPTIONS",
+      "description": "10 OPTIONS requests to different endpoints — method enumeration",
+      "pass_criterion": "Rate-limited (HTTP 429)",
+      "total_requests": 10,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Not rate-limited",
+      "result": "FAIL",
+      "avg_latency_ms": 5.400399999999999,
+      "max_latency_ms": 7.763,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "f6_details": "Rate-limit not maintained",
+      "action_sequence_summary": "allow(1-10)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 2,
+          "score": 0
+        },
+        {
+          "request": 5,
+          "score": 0
+        },
+        {
+          "request": 7,
+          "score": 0
+        },
+        {
+          "request": 10,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F6",
+        "F4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 7.763,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "496807d0-e951-4dc2-b594-0898634df2ef",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 7.601,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "bdc84f4f-0eb7-4ef9-a9d3-cbac74ca0e4e",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 4.697,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "6a21609e-3ce4-404e-9b7c-0b4ead42bcd4",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 8,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 5.122,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "e2685bbb-c46a-4970-b024-060ac53b8eac",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 9,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 4.876,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "037f23fb-a532-4146-9a3e-dcbf87059c47",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 10,
+          "url": "http://220.158.233.101:8080/",
+          "method": "OPTIONS",
+          "status_code": 404,
+          "latency_ms": 4.8,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/\",\"/var/www/app/__L05_VERBOSE_404__/.html\",\"/var/www/app/__L05_VERBOSE_404__//index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "162",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "ed69fbc2-ffa6-4ec2-a655-41ab226863b1",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl -X OPTIONS 'http://220.158.233.101:8080/' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# RE02: OPTIONS Abuse — method enumeration across endpoints\nfor ep in / /game/list /login /api/profile /admin /api /static /assets /user/settings /deposit; do\n  curl -s --interface 127.0.0.81 -X OPTIONS -o /dev/null -w \"OPTIONS ${ep}: %{http_code}\\n\" http://220.158.233.101:8080${ep}\ndone\n# Pass: Rate-limited (HTTP 429)"
+    },
+    {
+      "test_id": "RE03",
+      "name": "Error Harvesting",
+      "category": "recon",
+      "criterion": "SEC-03",
+      "source_ip": "127.0.0.82",
+      "endpoint": "/api/nonexistent",
+      "method": "GET",
+      "description": "GET requests to error endpoints — check for __L01_STACKTRACE__ markers",
+      "pass_criterion": "No __L01_STACKTRACE__ markers in responses",
+      "total_requests": 10,
+      "blocked_at": -1,
+      "passed": true,
+      "result": "PASS",
+      "avg_latency_ms": 5.8938999999999995,
+      "max_latency_ms": 8.921,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-10)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        },
+        {
+          "request": 2,
+          "score": 0
+        },
+        {
+          "request": 5,
+          "score": 0
+        },
+        {
+          "request": 7,
+          "score": 0
+        },
+        {
+          "request": 10,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "pass_conditions_met": [
+        "P4"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 6.859,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "eb6f981b-73f9-4219-a560-c26f48655036",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 2,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 4.873,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "886a77fc-85eb-4193-8c94-0dd3eee414de",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 3,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 5.797,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:46 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "462777de-3628-498d-af07-8d8638ea57dc",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 8,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 6.12,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:47 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "6a984f6a-5eec-44b7-a8a6-a5467135e8ba",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 9,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 5.365,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:47 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "fa7f75ba-f9e2-466f-86bc-5c5523cbcab7",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        },
+        {
+          "index": 10,
+          "url": "http://220.158.233.101:8080/api/nonexistent",
+          "method": "GET",
+          "status_code": 404,
+          "latency_ms": 4.858,
+          "response_body": "{\"error\":\"not_found\",\"tried_paths\":[\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent.html\",\"/var/www/app/__L05_VERBOSE_404__/api/nonexistent/index.html\"]}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "207",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:47 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "f477a9c6-3e39-4fee-b3c2-ff2f97ab5884",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/api/nonexistent' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "reproduce_script": "# RE03: Error Harvesting — trigger errors and check for leak markers\nfor i in $(seq 1 10); do\n  BODY=$(curl -s --interface 127.0.0.82 http://220.158.233.101:8080/api/nonexistent)\n  if echo \"$BODY\" | grep -q \"__L01_STACKTRACE__\"; then\n    echo \"LEAK DETECTED in request $i\"\n  fi\ndone\necho \"Check complete — Pass if no __L01_STACKTRACE__ marker found\"\n# Pass: No __L01_STACKTRACE__ markers in any response"
+    },
+    {
+      "test_id": "RE04",
+      "name": "Canary Probing",
+      "category": "recon",
+      "criterion": "SEC-04",
+      "source_ip": "127.0.0.85",
+      "endpoint": "/admin-test",
+      "method": "GET",
+      "description": "Probe 4 canary endpoints — WAF must block all + lock IP",
+      "pass_criterion": "All 4 canaries blocked (403) + follow-up request blocked (IP locked)",
+      "total_requests": 1,
+      "blocked_at": -1,
+      "passed": false,
+      "fail_reason": "Canaries not fully blocked or IP not locked",
+      "result": "FAIL",
+      "avg_latency_ms": 4.898,
+      "max_latency_ms": 4.898,
+      "max_risk_score": 0,
+      "avg_risk_score": 0,
+      "risk_baseline": 0,
+      "risk_delta": 0,
+      "intervention_point": -1,
+      "action_sequence_summary": "allow(1-1)",
+      "risk_progression": [
+        {
+          "request": 1,
+          "score": 0
+        }
+      ],
+      "observability": {
+        "headers_used": [
+          "X-Waf-Request-Id",
+          "X-Waf-Risk-Score",
+          "X-Waf-Action",
+          "X-Waf-Rule-Id",
+          "X-Waf-Cache",
+          "X-Waf-Mode"
+        ],
+        "headers_missing": null,
+        "observability_score": 1
+      },
+      "fail_conditions_triggered": [
+        "F5"
+      ],
+      "sample_requests": [
+        {
+          "index": 1,
+          "url": "http://220.158.233.101:8080/admin-test",
+          "method": "GET",
+          "status_code": 200,
+          "latency_ms": 4.898,
+          "response_body": "{\"admin\":true,\"marker\":\"__CANARY_HIT__\"}\n",
+          "response_headers": {
+            "Connection": "keep-alive",
+            "Content-Length": "41",
+            "Content-Type": "application/json; charset=utf-8",
+            "Date": "Tue, 12 May 2026 06:11:47 GMT",
+            "X-Forwarded-For": "220.158.233.101",
+            "X-Forwarded-Host": "220.158.233.101:8080",
+            "X-Forwarded-Proto": "http",
+            "X-Real-Ip": "220.158.233.101",
+            "X-Waf-Action": "allow",
+            "X-Waf-Bot-Score": "0",
+            "X-Waf-Cache": "BYPASS",
+            "X-Waf-Mode": "enforce",
+            "X-Waf-Request-Id": "a2e721cb-5503-4e23-8a5c-35542a9eb8ed",
+            "X-Waf-Risk-Level": "CLEAN",
+            "X-Waf-Risk-Score": "0",
+            "X-Waf-Rule-Id": "allowlist-bypass",
+            "X-Waf-Zone": "Clean"
+          },
+          "waf_action": "allow",
+          "risk_score": 0,
+          "blocked": false,
+          "curl_command": "curl 'http://220.158.233.101:8080/admin-test' -s -o - -w '\\nHTTP_STATUS:%%{http_code}' --max-time 30"
+        }
+      ],
+      "canary_result": {
+        "endpoints": [
+          "/admin-test",
+          "/api-debug",
+          "/.env",
+          "/wp-admin"
+        ],
+        "results": {
+          "/.env": 200,
+          "/admin-test": 200,
+          "/api-debug": 200,
+          "/wp-admin": 200
+        },
+        "all_blocked": false,
+        "follow_up_blocked": false
+      },
+      "reproduce_script": "# RE04: Canary Probing — probe 4 canary endpoints + follow-up\nfor ep in /admin-test /api-debug /.env /wp-admin; do\n  CODE=$(curl -s --interface 127.0.0.85 -o /dev/null -w \"%{http_code}\" http://220.158.233.101:8080${ep})\n  echo \"GET ${ep}: HTTP $CODE\"\ndone\n# Follow-up: same IP tries legitimate request\ncurl -s --interface 127.0.0.85 -o /dev/null -w \"Follow-up /game/list: %{http_code}\\n\" http://220.158.233.101:8080/game/list\n# Pass: All 4 canaries = 403 AND follow-up = 403 (IP locked)"
+    }
+  ],
+  "scores": {
+    "INT-01": 0,
+    "INT-02": 0,
+    "INT-03": 1.3333333333333333,
+    "SEC-03": 1.6666666666666667,
+    "SEC-04": 0
+  },
+  "total_score": 3,
+  "max_score": 24
+}

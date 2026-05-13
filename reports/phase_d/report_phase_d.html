@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WAF Benchmark — Phase D: Resilience & Degradation Report</title>
+<style>
+:root{--bg:#0b1120;--card:#111827;--card2:#1a2332;--text:#e2e8f0;--muted:#94a3b8;--subtle:#64748b;--green:#22c55e;--red:#ef4444;--yellow:#eab308;--blue:#3b82f6;--purple:#8b5cf6;--orange:#f97316;--border:#1e293b;--border2:#334155;--code-bg:#0f172a;--pre-bg:#0f172a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:0}
+.container{max-width:1400px;margin:0 auto;padding:20px 24px 60px}
+.main-header{background:linear-gradient(135deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:24px}
+.main-header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.main-header .sub{color:var(--muted);font-size:.85rem;margin-top:4px}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+.meta-item{display:flex;flex-direction:column}
+.meta-item .lbl{font-size:.7rem;color:var(--subtle);text-transform:uppercase;letter-spacing:.05em}
+.meta-item .val{font-size:.95rem;font-weight:600;word-break:break-all}
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:24px}
+.score-card h2{font-size:1.1rem;font-weight:700;margin-bottom:12px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
+.score-item{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:14px 16px;text-align:center}
+.score-item .crit{font-size:.7rem;color:var(--subtle);text-transform:uppercase;letter-spacing:.04em}
+.score-item .val{font-size:1.6rem;font-weight:800;color:var(--blue);margin:4px 0}
+.score-item .max{font-size:.75rem;color:var(--muted)}
+.score-item.pass .val{color:var(--green)}
+.score-item.fail .val{color:var(--red)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:24px}
+.section h2{font-size:1.1rem;font-weight:700;margin-bottom:16px}
+.reset-steps{display:flex;flex-direction:column;gap:6px}
+.reset-step{display:flex;align-items:center;gap:10px;padding:6px 0;font-family:monospace;font-size:.85rem}
+.reset-step .ok{color:var(--green);font-weight:700}
+.reset-step .fail{color:var(--red);font-weight:700}
+.step-num{color:var(--subtle);min-width:40px}
+.test-card{background:var(--card2);border:1px solid var(--border2);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.test-card-header{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--card);border-bottom:1px solid var(--border2);cursor:pointer}
+.test-card-header:hover{background:var(--border)}
+.test-id{font-family:monospace;font-weight:700;color:var(--blue);min-width:40px}
+.test-name{font-weight:600;font-size:.95rem}
+.test-badge{margin-left:auto;padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:700;text-transform:uppercase}
+.badge-pass{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.badge-fail{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.badge-skip{background:rgba(234,179,8,.15);color:var(--yellow);border:1px solid rgba(234,179,8,.3)}
+.test-card-body{padding:16px 20px}
+.test-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-bottom:12px}
+.test-meta-item{font-size:.82rem}
+.ml{color:var(--subtle);font-weight:500;margin-right:6px}
+.mv{color:var(--text)}
+.detail-section{margin:12px 0;padding:12px 16px;background:var(--card);border-radius:8px;border:1px solid var(--border)}
+.detail-section h4{font-size:.82rem;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.03em}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th,td{padding:6px 10px;text-align:left;border-bottom:1px solid var(--border2)}
+th{color:var(--subtle);font-weight:600;font-size:.75rem;text-transform:uppercase}
+td{font-family:monospace;font-size:.8rem}
+pre{background:var(--pre-bg);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'JetBrains Mono','Fira Code',monospace;font-size:.78rem;color:var(--muted);overflow-x:auto;max-height:400px;line-height:1.5}
+.scoring-explain{white-space:pre-wrap;font-family:monospace;font-size:.8rem;color:var(--muted);padding:8px 0;line-height:1.6}
+.scoring-explain.pass{color:var(--green)}
+.scoring-explain.fail{color:var(--red)}
+.fail-reason{padding:8px 16px;margin:8px 0;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;font-size:.82rem;color:var(--red)}
+hr{border:none;border-top:1px solid var(--border2);margin:16px 0}
+.summary-bar{display:flex;gap:24px;flex-wrap:wrap;padding:12px 0}
+.summary-stat{text-align:center}
+.summary-stat .num{font-size:2rem;font-weight:800;color:var(--blue)}
+.summary-stat .lbl{font-size:.7rem;color:var(--subtle);text-transform:uppercase}
+.tag-pass{color:var(--green);background:rgba(34,197,94,.1);padding:2px 6px;border-radius:4px;font-size:.75rem}
+.tag-fail{color:var(--red);background:rgba(239,68,68,.1);padding:2px 6px;border-radius:4px;font-size:.75rem}
+details summary{cursor:pointer;font-weight:600;color:var(--blue);font-size:.85rem;padding:4px 0}
+details summary:hover{color:var(--purple)}
+.code-block{position:relative}
+.code-block pre{margin:0}
+.footer{text-align:center;color:var(--subtle);font-size:.75rem;margin-top:32px;padding:16px}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.tier-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.tier-item h5{font-size:.82rem;color:var(--muted);margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="main-header">
+<h1>🛡️ WAF Benchmark — Phase D: Resilience & Degradation</h1>
+<div class="sub">INT-04 Scoring | Cap 8 pts | Raw Max 20 pts | 2026-05-12T12:06:13+07:00</div>
+<div class="meta-grid">
+<div class="meta-item"><span class="lbl">WAF Target</span><span class="val">http://220.158.233.101:8080</span></div>
+<div class="meta-item"><span class="lbl">WAF Mode</span><span class="val">enforce</span></div>
+<div class="meta-item"><span class="lbl">Duration</span><span class="val">268.8s</span></div>
+<div class="meta-item"><span class="lbl">Pre-Check</span><span class="val"><span style="color:var(--green);">✓ PASS</span></span></div>
+</div>
+</div><div class="score-card">
+<h2>📊 Scoring Summary</h2>
+<div class="summary-bar">
+<div class="summary-stat"><div class="num">1.0</div><div class="lbl">INT-04 Score</div></div>
+<div class="summary-stat"><div class="num">8</div><div class="lbl">Cap</div></div>
+<div class="summary-stat"><div class="num">1.0</div><div class="lbl">Raw Score</div></div>
+<div class="summary-stat"><div class="num">20</div><div class="lbl">Raw Max</div></div>
+<div class="summary-stat"><div class="num">1</div><div class="lbl">Passed</div></div>
+<div class="summary-stat"><div class="num">7</div><div class="lbl">Failed</div></div>
+<div class="summary-stat"><div class="num">1</div><div class="lbl">Skipped</div></div>
+</div>
+<div class="score-grid"><div class="score-item fail">
+<div class="crit">D01</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 3 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D02</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 2 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D03</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 2 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D04</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 7 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D05</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 2 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D06</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 1 pts</div>
+</div><div class="score-item pass">
+<div class="crit">D07</div><div class="val" style="color:var(--green);">PASS</div>
+<div class="max">1 / 1 pts</div>
+</div><div class="score-item fail">
+<div class="crit">D08</div><div class="val" style="color:var(--red);">FAIL</div>
+<div class="max">0 / 1 pts</div>
+</div><div class="score-item skip">
+<div class="crit">D09</div><div class="val" style="color:var(--yellow);">SKIP</div>
+<div class="max">0 / 1 pts</div>
+</div></div></div><div class="section">
+<h2>🔄 Full Reset Sequence (9 steps — §3.1)</h2>
+<div class="reset-steps"><div class="reset-step">
+<span class="step-num">[1/9]</span>
+<span class="ok">Reset UPSTREAM</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[2/9]</span>
+<span class="ok">UPSTREAM health check</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[3/9]</span>
+<span class="ok">Set UPSTREAM health (normal)</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[4/9]</span>
+<span class="ok">Set UPSTREAM slow (no delay)</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[5/9]</span>
+<span class="ok">Set WAF profile (enforce)</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[6/9]</span>
+<span class="ok">Flush WAF cache</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[7/9]</span>
+<span class="ok">Reset WAF state</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[8/9]</span>
+<span class="ok">WAF health check</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div><div class="reset-step">
+<span class="step-num">[9/9]</span>
+<span class="ok">Verify health</span>
+<span style="color:var(--muted);">✓</span>
+<span style="color:var(--subtle);">→ 200</span>
+</div></div></div><div class="section">
+<h2>📐 Scoring Methodology</h2>
+<pre style="white-space:pre-wrap;">INT-04 — Resilience &amp; Degradation (cap 8 pts, raw max 20 pts)
+
+Scoring Methodology (per phase_D.md v2.3 §6):
+
+  raw_score = sum(D01..D09 sub-scores)
+  INT-04   = min(8, raw_score)
+
+  Where each sub-score = 0 if test FAIL/SKIP, else max_score
+
+  D01 — HTTP Flood Survival     : 3 pts
+  D02 — Slowloris Handling      : 2 pts
+  D03 — RUDY Handling           : 2 pts
+  D04 — Fail-Close (CRITICAL)   : 4 pts
+  D04 — Fail-Open (MEDIUM)      : 3 pts
+  D05 — Circuit Breaker         : 2 pts
+  D06 — Backend Timeout         : 1 pt
+  D07 — Recovery                : 1 pt
+  D08+D09 — Fail-Mode Config    : 2 pts
+
+  WAF cần đạt ≥ 8/20 điểm thô để max INT-04.
+  Các tổ hợp đạt max: pass D01(3)+D04(4)+D05(2)=9, or D04(7)+D07(1)=8, etc.</pre>
+</div><div class="section">
+<h2>📂 CAT 1: DDoS Stress Tests <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(0/4 passed)</span></h2>
+
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D01</span>
+<span class="test-name">HTTP Flood Survival</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">ddos</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">3 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">71.3s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">WAF sống sót qua HTTP flood 50,000+ RPS trong 60 giây và vẫn xử lý legitimate requests.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">≥7/10 legitimate requests trong flood và ≥9/10 legitimate requests sau flood được xử lý; WAF không crash; không có circuit_breaker action.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: insufficient_flood_load</div><details open><summary>📈 Flood Metrics (wrk2)</summary>
+<div class="detail-section">
+<table><tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Actual RPS</td><td>52.9</td></tr>
+<tr><td>Transfer/sec</td><td>229.15KB</td></tr>
+<tr><td>Latency Avg</td><td>0.0ms</td></tr>
+<tr><td>Latency Stdev</td><td>0.0ms</td></tr>
+<tr><td>Latency Max</td><td>0.0ms</td></tr>
+<tr><td>P50</td><td>0.0ms</td></tr>
+<tr><td>P75</td><td>0.0ms</td></tr>
+<tr><td>P90</td><td>1.0ms</td></tr>
+<tr><td>P99</td><td>1.0ms</td></tr>
+<tr><td>Socket Errors (connect)</td><td>0</td></tr>
+<tr><td>Socket Errors (read)</td><td>0</td></tr>
+<tr><td>Socket Errors (write)</td><td>0</td></tr>
+<tr><td>Socket Errors (timeout)</td><td>11791</td></tr>
+</table></div></details><details open><summary>✅ During-flood Verification <span style="color:var(--green);">(5/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /health</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>5051.1ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>11012.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /about</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>11066.2ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>11077.8ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /sitemap.xml</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>11141.5ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>✅ Post-test Verification <span style="color:var(--green);">(5/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /about</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>455.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /health</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>457.0ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>936.4ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /sitemap.xml</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>2616.4ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>2915.8ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — insufficient_flood_load<br>  → Score: +0 pts<br>  • Reason: Flood tool achieved &lt;10% of target RPS — WAF rate-limiting prevented valid stress test<br>  • During-flood: 5/5 passed<br>  • Post-flood: 5/5 passed</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">waf_crashed</td><td>WAF process died during or after flood</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">during_verify_fail</td><td>&lt;7/10 legitimate requests passed during flood</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">insufficient_flood_load</td><td>Flood tool achieved &lt;10% of target RPS — WAF rate-limiting prevented valid stress test</td><td><span style="color:var(--red);">Yes — insufficient_flood_load</span></td></tr><tr><td style="font-family:monospace;">after_verify_fail</td><td>&lt;9/10 legitimate requests passed after flood</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">circuit_breaker</td><td>Legitimate requests received circuit_breaker (503) — unacceptable per contract §3.1 for volumetric abuse</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">tool_error</td><td>Flood tool (wrk2) failed to execute or returned unexpected output</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details><details><summary>🔧 wrk2 Raw Output</summary>
+<div class="code-block"><pre>Running 1m test @ http://220.158.233.101:8080/
+  20 threads and 500 connections
+  Thread calibration: mean lat.: 4794.788ms, rate sampling interval: 15802ms
+  Thread calibration: mean lat.: 4813.166ms, rate sampling interval: 13557ms
+  Thread calibration: mean lat.: 4935.672ms, rate sampling interval: 17301ms
+  Thread calibration: mean lat.: 5189.073ms, rate sampling interval: 17809ms
+  Thread calibration: mean lat.: 5380.005ms, rate sampling interval: 19185ms
+  Thread calibration: mean lat.: 4798.796ms, rate sampling interval: 13246ms
+  Thread calibration: mean lat.: 4989.547ms, rate sampling interval: 13926ms
+  Thread calibration: mean lat.: 5035.520ms, rate sampling interval: 13860ms
+  Thread calibration: mean lat.: 4794.026ms, rate sampling interval: 13443ms
+  Thread calibration: mean lat.: 5076.825ms, rate sampling interval: 14188ms
+  Thread calibration: mean lat.: 4652.557ms, rate sampling interval: 12075ms
+  Thread calibration: mean lat.: 4679.533ms, rate sampling interval: 13066ms
+  Thread calibration: mean lat.: 5561.741ms, rate sampling interval: 18939ms
+  Thread calibration: mean lat.: 4463.242ms, rate sampling interval: 12148ms
+  Thread calibration: mean lat.: 4650.144ms, rate sampling interval: 11984ms
+  Thread calibration: mean lat.: 4899.693ms, rate sampling interval: 10256ms
+  Thread calibration: mean lat.: 5047.278ms, rate sampling interval: 17580ms
+  Thread calibration: mean lat.: 3950.364ms, rate sampling interval: 11329ms
+  Thread calibration: mean lat.: 4395.660ms, rate sampling interval: 9912ms
+  Thread calibration: mean lat.: 4634.589ms, rate sampling interval: 10248ms
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    34.15s    14.67s    1.00m    59.07%
+    Req/Sec     2.02      0.65     3.00     98.41%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   34.90s 
+ 75.000%   46.92s 
+ 90.000%    0.88m 
+ 99.000%    1.00m 
+ 99.900%    1.00m 
+ 99.990%    1.00m 
+ 99.999%    1.00m 
+100.000%    1.00m 
+
+  Detailed Percentile spectrum:
+       Value   Percentile   TotalCount 1/(1-Percentile)
+
+   10092.543     0.000000            1         1.00
+   15040.511     0.100000          259         1.11
+   18923.519     0.200000          498         1.25
+   21692.415     0.300000          747         1.43
+   29900.799     0.400000          994         1.67
+   34897.919     0.500000         1249         2.00
+   36503.551     0.550000         1374         2.22
+   39550.975     0.600000         1491         2.50
+   40435.711     0.650000         1620         2.86
+   43450.367     0.700000         1750         3.33
+   46923.775     0.750000         1865         4.00
+   48529.407     0.775000         1927         4.44
+   48824.319     0.800000         1990         5.00
+   49020.927     0.825000         2051         5.71
+   52494.335     0.850000         2129         6.67
+   52559.871     0.875000         2184         8.00
+   52625.407     0.887500         2213         8.89
+   52756.479     0.900000         2244        10.00
+   56426.495     0.912500         2269        11.43
+   57147.391     0.925000         2299        13.33
+   57999.359     0.937500         2333        16.00
+   58392.575     0.943750         2347        17.78
+   58621.951     0.950000         2363        20.00
+   58916.863     0.956250         2377        22.86
+   59473.919     0.962500         2393        26.67
+   59539.455     0.968750         2420        32.00
+   59539.455     0.971875         2420        35.56
+   59572.223     0.975000         2436        40.00
+   59572.223     0.978125         2436        45.71
+   59604.991     0.981250         2450        53.33
+   59604.991     0.984375         2450        64.00
+   59637.759     0.985938         2455        71.11
+   59637.759     0.987500         2455        80.00
+   59670.527     0.989062         2458        91.43
+   59736.063     0.990625         2465       106.67
+   59768.831     0.992188         2478       128.00
+   59768.831     0.992969         2478       142.22
+   59768.831     0.993750         2478       160.00
+   59768.831     0.994531         2478       182.86
+   59768.831     0.995313         2478       213.33
+   59768.831     0.996094         2478       256.00
+   59768.831     0.996484         2478       284.44
+   59768.831     0.996875         2478       320.00
+   59801.599     0.997266         2481       365.71
+   59801.599     0.997656         2481       426.67
+   59801.599     0.998047         2481       512.00
+   59801.599     0.998242         2481       568.89
+   59834.367     0.998437         2484       640.00
+   59834.367     0.998633         2484       731.43
+   59834.367     0.998828         2484       853.33
+   59834.367     0.999023         2484      1024.00
+   59834.367     0.999121         2484      1137.78
+   59834.367     0.999219         2484      1280.00
+   59834.367     0.999316         2484      1462.86
+   59834.367     0.999414         2484      1706.67
+   59834.367     0.999512         2484      2048.00
+   59834.367     0.999561         2484      2275.56
+   59867.135     0.999609         2485      2560.00
+   59867.135     1.000000         2485          inf
+#[Mean    =    34150.056, StdDeviation   =    14670.352]
+#[Max     =    59834.368, Total count    =         2485]
+#[Buckets =           27, SubBuckets     =         2048]
+----------------------------------------------------------
+  3183 requests in 1.00m, 13.46MB read
+  Socket errors: connect 0, read 0, write 0, timeout 11791
+Requests/sec:     52.92
+Transfer/sec:    229.15KB
+</pre></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D02</span>
+<span class="test-name">Slowloris Defense</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">ddos</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">2 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">31.0s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">WAF phát hiện và timeout 500 slow connections (1 byte/s headers, không bao giờ hoàn thành) trong 30 giây, đồng thời vẫn chấp nhận kết nối mới hợp lệ.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">≥90% slow connections bị timeout/closed (&lt;120s); Service Available = YES; legitimate traffic vẫn accepted.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: no_connections_established</div><details open><summary>🐢 Slow Connection Metrics (slowhttptest)</summary>
+<div class="detail-section">
+<table><tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Connections Open</td><td>0</td></tr>
+<tr><td>Connections Closed</td><td>0</td></tr>
+<tr><td>Connections Error</td><td>0</td></tr>
+<tr><td>Connections Pending</td><td>0</td></tr>
+<tr><td>Service Available</td><td style="color:var(--green);">true</td></tr>
+<tr><td>Exit Status</td><td>0</td></tr>
+</table></div></details><details open><summary>✅ Post-test Verification <span style="color:var(--green);">(5/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /about</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>22.1ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /health</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>73.3ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>89.7ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /sitemap.xml</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>107.5ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>108.6ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — no_connections_established<br>  → Score: +0 pts<br>  • Reason: slowhttptest could not establish any connections — WAF may be blocking at connection level<br>  • Connections: 0 closed, 0 pending, 0 error<br>  • Service Available: true</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">service_unavailable</td><td>Service Available = NO — WAF không chấp nhận kết nối mới</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">high_pending</td><td>≥50 connections still pending sau 120s — WAF không timeout connections</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">no_connections_established</td><td>slowhttptest could not establish any connections — WAF may be blocking at connection level</td><td><span style="color:var(--red);">Yes — no_connections_established</span></td></tr><tr><td style="font-family:monospace;">post_verify_fail</td><td>Legitimate requests bị từ chối sau slowloris test</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">tool_error</td><td>slowhttptest failed to execute</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details><details><summary>🔧 slowhttptest Raw Output</summary>
+<div class="code-block"><pre>Tue May 12 12:07:27 2026:[H[2JTue May 12 12:07:27 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:27 2026:[1;32m
+slow HTTP test status on [0;32m0[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        1
+[1;32mconnected:   [1;32m        0
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:32 2026:[H[2JTue May 12 12:07:32 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:32 2026:[1;32m
+slow HTTP test status on [0;32m5[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:37 2026:[H[2JTue May 12 12:07:37 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:37 2026:[1;32m
+slow HTTP test status on [0;32m10[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:42 2026:[H[2JTue May 12 12:07:42 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:42 2026:[1;32m
+slow HTTP test status on [0;32m15[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:47 2026:[H[2JTue May 12 12:07:47 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:47 2026:[1;32m
+slow HTTP test status on [0;32m20[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:52 2026:[H[2JTue May 12 12:07:52 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:52 2026:[1;32m
+slow HTTP test status on [0;32m25[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:57 2026:[H[2JTue May 12 12:07:57 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW HEADERS
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          52
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:57 2026:[1;32m
+slow HTTP test status on [0;32m30[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:07:58 2026:[0;36m
+Test ended on 31th second
+Exit status:[1;36m Hit test time limit
+[0m[0;36mCSV report saved to [1;36md02.csv
+[0m[0;36mHTML report saved to [1;36md02.html
+[0m</pre></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D03</span>
+<span class="test-name">RUDY Defense</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">ddos</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">2 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">31.0s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">WAF phát hiện và kill 500 slow POST connections (Content-Length: 1000000, nhỏ giọt 1 byte/s body) trong 30 giây.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">≥90% slow POST connections bị timeout/closed; Service Available = YES; legitimate traffic vẫn accepted.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: no_connections_established</div><details open><summary>🐢 Slow Connection Metrics (slowhttptest)</summary>
+<div class="detail-section">
+<table><tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Connections Open</td><td>0</td></tr>
+<tr><td>Connections Closed</td><td>0</td></tr>
+<tr><td>Connections Error</td><td>0</td></tr>
+<tr><td>Connections Pending</td><td>0</td></tr>
+<tr><td>Service Available</td><td style="color:var(--green);">true</td></tr>
+<tr><td>Exit Status</td><td>0</td></tr>
+</table></div></details><details open><summary>✅ Post-test Verification <span style="color:var(--green);">(5/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /health</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>334.2ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>475.8ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /about</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>1002.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>1015.6ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /sitemap.xml</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>1633.6ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — no_connections_established<br>  → Score: +0 pts<br>  • Reason: slowhttptest could not establish any connections — WAF may be blocking at connection level<br>  • Connections: 0 closed, 0 pending, 0 error<br>  • Service Available: true</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">service_unavailable</td><td>Service Available = NO — WAF không chấp nhận kết nối mới</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">high_pending</td><td>≥50 connections still pending sau 120s</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">no_connections_established</td><td>slowhttptest could not establish any connections — WAF may be blocking at connection level</td><td><span style="color:var(--red);">Yes — no_connections_established</span></td></tr><tr><td style="font-family:monospace;">post_verify_fail</td><td>Legitimate requests bị từ chối sau RUDY test</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">tool_error</td><td>slowhttptest failed to execute</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details><details><summary>🔧 slowhttptest Raw Output</summary>
+<div class="code-block"><pre>Tue May 12 12:07:58 2026:[H[2JTue May 12 12:07:58 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:07:58 2026:[1;32m
+slow HTTP test status on [0;32m0[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        1
+[1;32mconnected:   [1;32m        0
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:03 2026:[H[2JTue May 12 12:08:03 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:03 2026:[1;32m
+slow HTTP test status on [0;32m5[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:08 2026:[H[2JTue May 12 12:08:08 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:08 2026:[1;32m
+slow HTTP test status on [0;32m10[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:13 2026:[H[2JTue May 12 12:08:13 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:13 2026:[1;32m
+slow HTTP test status on [0;32m15[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:18 2026:[H[2JTue May 12 12:08:18 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:18 2026:[1;32m
+slow HTTP test status on [0;32m20[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        500
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        0
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:23 2026:[H[2JTue May 12 12:08:23 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:23 2026:[1;32m
+slow HTTP test status on [0;32m25[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        451
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        49
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:28 2026:[H[2JTue May 12 12:08:28 2026:
+	[1;36mslowhttptest version 1.9.0
+ - https://github.com/shekyan/slowhttptest -
+[0;34mtest type:[1;34m                        SLOW BODY
+[0;34mnumber of connections:[1;34m            500
+[0;34mURL:[1;34m                              http://220.158.233.101:8080/login
+[0;34mverb:[1;34m                             GET
+[0;34mcookie:[1;34m                           
+[0;34mheader:[1;34m                           
+[0;34mContent-Length header value:[1;34m      4096
+[0;34mfollow up data max size:[1;34m          50
+[0;34minterval between follow up data:[1;34m  10 seconds
+[0;34mconnections per seconds:[1;34m          200
+[0;34mprobe connection timeout:[1;34m         3 seconds
+[0;34mtest duration:[1;34m                    30 seconds
+[0;34musing proxy:[1;34m                      no proxy 
+
+[0mTue May 12 12:08:28 2026:[1;32m
+slow HTTP test status on [0;32m30[1;32mth second:
+
+[1;32minitializing:[1;32m        0
+[1;32mpending:     [1;32m        0
+[1;32mconnected:   [1;32m        451
+[1;32merror:       [1;32m        0
+[1;32mclosed:      [1;32m        49
+[1;32mservice available:[1;32m   [1;32mYES[0m
+[0mTue May 12 12:08:29 2026:[0;36m
+Test ended on 31th second
+Exit status:[1;36m Hit test time limit
+[0m[0;36mCSV report saved to [1;36md03.csv
+[0m[0;36mHTML report saved to [1;36md03.html
+[0m</pre></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D04</span>
+<span class="test-name">WAF-Targeted Flood (Fail-Close + Fail-Open)</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">ddos</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">7 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">68.1s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Khi WAF bị overload ở 100,000+ RPS, CRITICAL routes phải fail-close (503) và MEDIUM/CATCH_ALL/STATIC routes phải fail-open (200 từ upstream).</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">CRITICAL: 4/4 routes fail-close (503) → +4 pts; MEDIUM+CATCH_ALL+STATIC: ≥8/10 routes fail-open (200) → +3 pts.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: critical_fail_close</div><details open><summary>🏷️ Route Tier Results</summary><div class="tier-grid"><div class="tier-item">
+<h5>CRITICAL Tier <span style="color:var(--red);">(0/4)</span> <span style="color:var(--subtle);">expect fail_close</span></h5>
+<table><tr><th>Route</th><th>Status</th><th>Action</th></tr><tr><td>POST /otp</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>POST /withdrawal</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>POST /deposit</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>POST /login</td><td style="color:var(--red);">401</td><td>allow</td></tr></table></div><div class="tier-item">
+<h5>MEDIUM Tier <span style="color:var(--red);">(2/5)</span> <span style="color:var(--subtle);">expect fail_open</span></h5>
+<table><tr><th>Route</th><th>Status</th><th>Action</th></tr><tr><td>GET /game/list</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /user/settings</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>GET /api/profile</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>GET /game/1</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /api/transactions</td><td style="color:var(--red);">401</td><td>allow</td></tr></table></div><div class="tier-item">
+<h5>CATCH_ALL Tier <span style="color:var(--green);">(3/3)</span> <span style="color:var(--subtle);">expect fail_open</span></h5>
+<table><tr><th>Route</th><th>Status</th><th>Action</th></tr><tr><td>GET /sitemap.xml</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /about</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /</td><td style="color:var(--green);">200</td><td>allow</td></tr></table></div><div class="tier-item">
+<h5>STATIC Tier <span style="color:var(--red);">(1/2)</span> <span style="color:var(--subtle);">expect fail_open</span></h5>
+<table><tr><th>Route</th><th>Status</th><th>Action</th></tr><tr><td>GET /static/js/app.js</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /assets/css/style.css</td><td style="color:var(--red);">404</td><td>allow</td></tr></table></div></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — critical_fail_close<br>  → Score: +0 pts<br>  • Reason: CRITICAL routes not all fail-close (503)<br>  • CRITICAL: 0/4 correct (expected fail_close)<br>  • MEDIUM: 2/5 correct (expected fail_open)<br>  • CATCH_ALL: 3/3 correct (expected fail_open)<br>  • STATIC: 1/2 correct (expected fail_open)</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">waf_crashed</td><td>WAF process died during flood</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">critical_fail_close</td><td>CRITICAL routes not all fail-close (503)</td><td><span style="color:var(--red);">Yes — critical_fail_close</span></td></tr><tr><td style="font-family:monospace;">medium_fail_open</td><td>MEDIUM/CATCH_ALL/STATIC routes not all fail-open (200)</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">tool_error</td><td>Flood tool (wrk2) failed to execute</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details><details><summary>🔧 wrk2 Raw Output</summary>
+<div class="code-block"><pre>Running 1m test @ http://220.158.233.101:8080/
+  20 threads and 500 connections
+  Thread calibration: mean lat.: 8749.056ms, rate sampling interval: 19972ms
+  Thread calibration: mean lat.: 8727.113ms, rate sampling interval: 20103ms
+  Thread calibration: mean lat.: 9273.636ms, rate sampling interval: 19939ms
+  Thread calibration: mean lat.: 8474.949ms, rate sampling interval: 19972ms
+  Thread calibration: mean lat.: 8208.896ms, rate sampling interval: 19955ms
+  Thread calibration: mean lat.: 8441.173ms, rate sampling interval: 19955ms
+  Thread calibration: mean lat.: 7177.830ms, rate sampling interval: 17170ms
+  Thread calibration: mean lat.: 7599.465ms, rate sampling interval: 20070ms
+  Thread calibration: mean lat.: 8424.581ms, rate sampling interval: 19988ms
+  Thread calibration: mean lat.: 7217.265ms, rate sampling interval: 19431ms
+  Thread calibration: mean lat.: 9462.442ms, rate sampling interval: 20004ms
+  Thread calibration: mean lat.: 8575.658ms, rate sampling interval: 18399ms
+  Thread calibration: mean lat.: 7214.403ms, rate sampling interval: 19841ms
+  Thread calibration: mean lat.: 8274.628ms, rate sampling interval: 19939ms
+  Thread calibration: mean lat.: 8944.174ms, rate sampling interval: 19906ms
+  Thread calibration: mean lat.: 9035.776ms, rate sampling interval: 19906ms
+  Thread calibration: mean lat.: 8226.816ms, rate sampling interval: 19775ms
+  Thread calibration: mean lat.: 8693.436ms, rate sampling interval: 19890ms
+  Thread calibration: mean lat.: 7827.046ms, rate sampling interval: 19955ms
+  Thread calibration: mean lat.: 8901.290ms, rate sampling interval: 19922ms
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    31.84s    14.92s    1.00m    52.32%
+    Req/Sec     1.68      0.47     2.00    100.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   32.83s 
+ 75.000%   47.25s 
+ 90.000%    0.90m 
+ 99.000%    0.99m 
+ 99.900%    1.00m 
+ 99.990%    1.00m 
+ 99.999%    1.00m 
+100.000%    1.00m 
+
+  Detailed Percentile spectrum:
+       Value   Percentile   TotalCount 1/(1-Percentile)
+
+   10231.807     0.000000            1         1.00
+   11354.111     0.100000          193         1.11
+   15523.839     0.200000          385         1.25
+   21708.799     0.300000          577         1.43
+   24068.095     0.400000          773         1.67
+   32833.535     0.500000          963         2.00
+   33292.287     0.550000         1057         2.22
+   35946.495     0.600000         1153         2.50
+   37519.359     0.650000         1249         2.86
+   43220.991     0.700000         1345         3.33
+   47251.455     0.750000         1442         4.00
+   47644.671     0.775000         1496         4.44
+   47775.743     0.800000         1540         5.00
+   48562.175     0.825000         1595         5.71
+   48660.479     0.850000         1641         6.67
+   48758.783     0.875000         1691         8.00
+   49446.911     0.887500         1707         8.89
+   53968.895     0.900000         1732        10.00
+   54067.199     0.912500         1754        11.43
+   54132.735     0.925000         1790        13.33
+   54165.503     0.937500         1802        16.00
+   54231.039     0.943750         1818        17.78
+   54394.879     0.950000         1826        20.00
+   54722.559     0.956250         1838        22.86
+   55017.471     0.962500         1850        26.67
+   57311.231     0.968750         1861        32.00
+   58359.807     0.971875         1869        35.56
+   58458.111     0.975000         1873        40.00
+   58753.023     0.978125         1879        45.71
+   58884.095     0.981250         1886        53.33
+   59015.167     0.984375         1891        64.00
+   59146.239     0.985938         1894        71.11
+   59277.311     0.987500         1899        80.00
+   59310.079     0.989062         1900        91.43
+   59408.383     0.990625         1903       106.67
+   59441.151     0.992188         1906       128.00
+   59539.455     0.992969         1909       142.22
+   59539.455     0.993750         1909       160.00
+   59604.991     0.994531         1911       182.86
+   59637.759     0.995313         1912       213.33
+   59703.295     0.996094         1916       256.00
+   59703.295     0.996484         1916       284.44
+   59703.295     0.996875         1916       320.00
+   59703.295     0.997266         1916       365.71
+   59768.831     0.997656         1917       426.67
+   59801.599     0.998047         1918       512.00
+   59801.599     0.998242         1918       568.89
+   59801.599     0.998437         1918       640.00
+   59867.135     0.998633         1920       731.43
+   59867.135     0.998828         1920       853.33
+   59867.135     0.999023         1920      1024.00
+   59867.135     0.999121         1920      1137.78
+   59867.135     0.999219         1920      1280.00
+   59867.135     0.999316         1920      1462.86
+   59867.135     0.999414         1920      1706.67
+   59899.903     0.999512         1921      2048.00
+   59899.903     1.000000         1921          inf
+#[Mean    =    31837.423, StdDeviation   =    14920.896]
+#[Max     =    59867.136, Total count    =         1921]
+#[Buckets =           27, SubBuckets     =         2048]
+----------------------------------------------------------
+  2177 requests in 1.00m, 9.21MB read
+  Socket errors: connect 0, read 0, write 0, timeout 12779
+Requests/sec:     36.19
+Transfer/sec:    156.71KB
+</pre></div></details></div></div></div><div class="section">
+<h2>📂 CAT 2: Backend Failure Tests <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(1/3 passed)</span></h2>
+
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D05</span>
+<span class="test-name">Backend Down / Circuit Breaker</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">backend_failure</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">2 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">6.4s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Khi UPSTREAM bị DOWN, WAF phát hiện và circuit-break (trả 503 circuit_breaker), không treo.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">Tất cả verification requests qua WAF trả về 503 với X-WAF-Action: circuit_breaker.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: no_circuit_breaker</div><details open><summary>✅ Post-test Verification <span style="color:var(--red);">(0/3 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /health</td>
+<td style="color:var(--red);">200</td>
+<td>503</td>
+<td>786.8ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--red);">200</td>
+<td>503</td>
+<td>813.1ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>POST /login</td>
+<td style="color:var(--red);">401</td>
+<td>503</td>
+<td>843.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — no_circuit_breaker<br>  → Score: +0 pts<br>  • Reason: WAF không trả circuit_breaker — có thể treo, timeout, hoặc trả action khác</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">no_circuit_breaker</td><td>WAF không trả circuit_breaker — có thể treo, timeout, hoặc trả action khác</td><td><span style="color:var(--red);">Yes — no_circuit_breaker</span></td></tr><tr><td style="font-family:monospace;">wrong_status</td><td>WAF trả status khác 503</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">upstream_control_fail</td><td>Không thể set UPSTREAM về chế độ DOWN</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D06</span>
+<span class="test-name">Backend Slow / Timeout</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">backend_failure</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">1 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">10.5s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Khi UPSTREAM chậm (delay 10s), WAF timeout và trả 504 thay vì treo.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">Tất cả verification requests qua WAF trả về 504 Gateway Timeout.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: no_timeout</div><details open><summary>✅ Post-test Verification <span style="color:var(--red);">(0/2 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /</td>
+<td style="color:var(--red);">200</td>
+<td>504</td>
+<td>36.5ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--red);">200</td>
+<td>504</td>
+<td>37.4ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — no_timeout<br>  → Score: +0 pts<br>  • Reason: WAF không timeout — treo hoặc trả status khác</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">no_timeout</td><td>WAF không timeout — treo hoặc trả status khác</td><td><span style="color:var(--red);">Yes — no_timeout</span></td></tr><tr><td style="font-family:monospace;">wrong_status</td><td>WAF trả status khác 504</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">upstream_control_fail</td><td>Không thể set UPSTREAM về chế độ SLOW</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D07</span>
+<span class="test-name">Recovery</span>
+<span class="test-badge badge-pass">PASS</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">backend_failure</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">1 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">0.6s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--green);">1 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Sau khi UPSTREAM được khôi phục (từ DOWN và SLOW), WAF tiếp tục proxy bình thường.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">Tất cả legitimate requests trả về 200 OK.</span></div>
+</div><details open><summary>✅ Post-test Verification <span style="color:var(--green);">(5/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>79.9ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /health</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>80.9ms</td>
+<td></td>
+<td>0</td>
+</tr><tr>
+<td>GET /sitemap.xml</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>107.0ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /about</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>121.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>122.0ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>🔄 Recovery Results (5 routes)</summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th></tr><tr><td>GET /</td><td style="color:var(--green);">200</td></tr><tr><td>GET /about</td><td style="color:var(--green);">200</td></tr><tr><td>GET /health</td><td style="color:var(--green);">200</td></tr><tr><td>GET /sitemap.xml</td><td style="color:var(--green);">200</td></tr><tr><td>GET /game/list</td><td style="color:var(--green);">200</td></tr></table></div>
+<div>Recovered: <span style="color:var(--green);font-weight:700;">true</span></div>
+</details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain pass">✓ PASS — Tất cả legitimate requests trả về 200 OK.<br>  → Score: +1/1 pts<br>  • 5/5 routes recovered to 200 OK</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">recovery_fail</td><td>WAF không phục hồi sau khi UPSTREAM restored</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">still_circuit_broken</td><td>WAF vẫn circuit-break sau khi UPSTREAM healthy</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">still_timeout</td><td>WAF vẫn timeout sau khi UPSTREAM fast</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details></div></div></div><div class="section">
+<h2>📂 CAT 3: Fail-Mode Configurability <span style="font-weight:400;color:var(--muted);font-size:.85rem;">(0/2 passed)</span></h2>
+
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D08</span>
+<span class="test-name">Fail-Mode Configurable</span>
+<span class="test-badge badge-fail">FAIL</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">fail_mode_config</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">1 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">31.3s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Chứng minh fail-mode có thể cấu hình được — đổi MEDIUM tier fail_mode: close trong WAF config và hot-reload, MEDIUM routes chuyển từ fail-open sang fail-close dưới tải.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">Sau khi config MEDIUM tier fail_mode=close, ≥4/5 MEDIUM routes fail-close (503) dưới tải.</span></div>
+</div><div class="fail-reason">❌ Fail Reason: medium_not_fail_close</div><details open><summary>✅ Post-test Verification <span style="color:var(--red);">(2/5 passed)</span></summary>
+<div class="detail-section"><table><tr><th>Route</th><th>Status</th><th>Expected</th><th>Latency</th><th>WAF Action</th><th>Risk</th></tr><tr>
+<td>GET /api/transactions</td>
+<td style="color:var(--red);">401</td>
+<td>200</td>
+<td>9332.5ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /api/profile</td>
+<td style="color:var(--red);">401</td>
+<td>200</td>
+<td>11872.8ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/list</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>12628.8ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /user/settings</td>
+<td style="color:var(--red);">401</td>
+<td>200</td>
+<td>12630.5ms</td>
+<td>allow</td>
+<td>0</td>
+</tr><tr>
+<td>GET /game/1</td>
+<td style="color:var(--green);">200</td>
+<td>200</td>
+<td>12684.3ms</td>
+<td>allow</td>
+<td>0</td>
+</tr></table></div></details><details open><summary>🏷️ Route Tier Results</summary><div class="tier-grid"><div class="tier-item">
+<h5>MEDIUM Tier <span style="color:var(--red);">(2/5)</span> <span style="color:var(--subtle);">expect fail_close</span></h5>
+<table><tr><th>Route</th><th>Status</th><th>Action</th></tr><tr><td>GET /game/list</td><td style="color:var(--green);">200</td><td>allow</td></tr><tr><td>GET /user/settings</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>GET /api/transactions</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>GET /api/profile</td><td style="color:var(--red);">401</td><td>allow</td></tr><tr><td>GET /game/1</td><td style="color:var(--green);">200</td><td>allow</td></tr></table></div></div></details><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail">✗ FAIL — medium_not_fail_close<br>  → Score: +0 pts<br>  • Reason: MEDIUM routes vẫn fail-open sau khi đổi config</div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">config_not_found</td><td>Không tìm thấy WAF config file</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">config_format_error</td><td>WAF config format không nhận diện được</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">config_not_applied</td><td>Config change không có hiệu lực sau hot-reload</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">medium_not_fail_close</td><td>MEDIUM routes vẫn fail-open sau khi đổi config</td><td><span style="color:var(--red);">Yes — medium_not_fail_close</span></td></tr></table></div></details><details><summary>🔧 wrk2 Raw Output</summary>
+<div class="code-block"><pre>Running 30s test @ http://220.158.233.101:8080/
+  20 threads and 500 connections
+  Thread calibration: mean lat.: 8450.910ms, rate sampling interval: 19021ms
+  Thread calibration: mean lat.: 8520.635ms, rate sampling interval: 19120ms
+  Thread calibration: mean lat.: 7933.098ms, rate sampling interval: 18939ms
+  Thread calibration: mean lat.: 8934.707ms, rate sampling interval: 18956ms
+  Thread calibration: mean lat.: 8958.045ms, rate sampling interval: 18989ms
+  Thread calibration: mean lat.: 8642.944ms, rate sampling interval: 18972ms
+  Thread calibration: mean lat.: 8661.947ms, rate sampling interval: 18923ms
+  Thread calibration: mean lat.: 8499.931ms, rate sampling interval: 18972ms
+  Thread calibration: mean lat.: 8289.536ms, rate sampling interval: 18972ms
+  Thread calibration: mean lat.: 7941.957ms, rate sampling interval: 18857ms
+  Thread calibration: mean lat.: 8092.278ms, rate sampling interval: 16654ms
+  Thread calibration: mean lat.: 8647.748ms, rate sampling interval: 18661ms
+  Thread calibration: mean lat.: 8779.288ms, rate sampling interval: 18759ms
+  Thread calibration: mean lat.: 8669.070ms, rate sampling interval: 19021ms
+  Thread calibration: mean lat.: 8066.161ms, rate sampling interval: 18694ms
+  Thread calibration: mean lat.: 8453.389ms, rate sampling interval: 18546ms
+  Thread calibration: mean lat.: 7872.870ms, rate sampling interval: 18481ms
+  Thread calibration: mean lat.: 8490.780ms, rate sampling interval: 18612ms
+  Thread calibration: mean lat.: 8918.177ms, rate sampling interval: 19038ms
+  Thread calibration: mean lat.: 8485.449ms, rate sampling interval: 18939ms
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency    20.56s     6.57s   29.95s    48.38%
+    Req/Sec     1.00      0.00     1.00    100.00%
+  Latency Distribution (HdrHistogram - Recorded Latency)
+ 50.000%   22.95s 
+ 75.000%   25.15s 
+ 90.000%   28.64s 
+ 99.000%   29.74s 
+ 99.900%   29.88s 
+ 99.990%   29.97s 
+ 99.999%   29.97s 
+100.000%   29.97s 
+
+  Detailed Percentile spectrum:
+       Value   Percentile   TotalCount 1/(1-Percentile)
+
+    9609.215     0.000000            1         1.00
+   10797.055     0.100000           59         1.11
+   12886.015     0.200000          117         1.25
+   13172.735     0.300000          179         1.43
+   20037.631     0.400000          234         1.67
+   22953.983     0.500000          294         2.00
+   23986.175     0.550000          322         2.22
+   24887.295     0.600000          362         2.50
+   24936.447     0.650000          382         2.86
+   25067.519     0.700000          414         3.33
+   25149.439     0.750000          444         4.00
+   25739.263     0.775000          454         4.44
+   26198.015     0.800000          468         5.00
+   28278.783     0.825000          486         5.71
+   28377.087     0.850000          498         6.67
+   28540.927     0.875000          513         8.00
+   28606.463     0.887500          521         8.89
+   28639.231     0.900000          527        10.00
+   28655.615     0.912500          536        11.43
+   28688.383     0.925000          543        13.33
+   28737.535     0.937500          550        16.00
+   28753.919     0.943750          553        17.78
+   28770.303     0.950000          556        20.00
+   28786.687     0.956250          565        22.86
+   28786.687     0.962500          565        26.67
+   28819.455     0.968750          567        32.00
+   28835.839     0.971875          573        35.56
+   28835.839     0.975000          573        40.00
+   28835.839     0.978125          573        45.71
+   28868.607     0.981250          575        53.33
+   28901.375     0.984375          576        64.00
+   29589.503     0.985938          577        71.11
+   29622.271     0.987500          578        80.00
+   29736.959     0.989062          579        91.43
+   29769.727     0.990625          580       106.67
+   29786.111     0.992188          581       128.00
+   29786.111     0.992969          581       142.22
+   29802.495     0.993750          582       160.00
+   29802.495     0.994531          582       182.86
+   29835.263     0.995313          583       213.33
+   29835.263     0.996094          583       256.00
+   29835.263     0.996484          583       284.44
+   29884.415     0.996875          584       320.00
+   29884.415     0.997266          584       365.71
+   29884.415     0.997656          584       426.67
+   29884.415     0.998047          584       512.00
+   29884.415     0.998242          584       568.89
+   29966.335     0.998437          585       640.00
+   29966.335     1.000000          585          inf
+#[Mean    =    20564.168, StdDeviation   =     6571.728]
+#[Max     =    29949.952, Total count    =          585]
+#[Buckets =           27, SubBuckets     =         2048]
+----------------------------------------------------------
+  933 requests in 30.15s, 3.95MB read
+  Socket errors: connect 0, read 0, write 0, timeout 6511
+Requests/sec:     30.95
+Transfer/sec:    134.00KB
+</pre></div></details></div></div>
+<div class="test-card">
+<div class="test-card-header">
+<span class="test-id">D09</span>
+<span class="test-name">Fail-Mode Restore</span>
+<span class="test-badge badge-skip">SKIP</span>
+</div>
+<div class="test-card-body">
+<div class="test-meta">
+<div class="test-meta-item"><span class="ml">Category:</span><span class="mv">fail_mode_config</span></div>
+<div class="test-meta-item"><span class="ml">Max Score:</span><span class="mv">1 pts</span></div>
+<div class="test-meta-item"><span class="ml">Duration:</span><span class="mv">0.0s</span></div>
+<div class="test-meta-item"><span class="ml">Score Earned:</span><span class="mv" style="color:var(--red);">0 pts</span></div>
+</div><div class="detail-section">
+<div class="test-meta-item"><span class="ml">Description:</span><span class="mv">Revert fail-mode về open cho MEDIUM, hot-reload, và verify MEDIUM routes trở lại fail-open dưới tải.</span></div>
+<div class="test-meta-item"><span class="ml">Pass Criterion:</span><span class="mv">Sau khi revert MEDIUM tier fail_mode=open, ≥4/5 MEDIUM routes fail-open (200) dưới tải.</span></div>
+</div><div class="fail-reason" style="color:var(--yellow);background:rgba(234,179,8,.08);border-color:rgba(234,179,8,.2);">⚠️ Skip Reason: prerequisite D08 not met</div><details open><summary>📊 Scoring Explanation</summary>
+<div class="scoring-explain fail"></div></details><details><summary>📋 PASS/FAIL Criteria</summary><div class="detail-section"><table><tr><th>Condition</th><th>Description</th><th>Triggered</th></tr><tr><td style="font-family:monospace;">medium_not_fail_open</td><td>MEDIUM routes vẫn fail-close sau khi revert</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">prereq_d08_failed</td><td>Prerequisite D08 not met — cannot test restore</td><td><span style="color:var(--green);">No</span></td></tr><tr><td style="font-family:monospace;">config_not_applied</td><td>Config revert không có hiệu lực sau hot-reload</td><td><span style="color:var(--green);">No</span></td></tr></table></div></details></div></div></div><div class="section">
+<h2>🗺️ Scoring Map</h2>
+<pre>INT-04 — Resilience &amp; Degradation (cap 8 pts, raw max 20 pts)
+
+Scoring Methodology (per phase_D.md v2.3 §6):
+
+  raw_score = sum(D01..D09 sub-scores)
+  INT-04   = min(8, raw_score)
+
+  Where each sub-score = 0 if test FAIL/SKIP, else max_score
+
+  D01 — HTTP Flood Survival     : 3 pts
+  D02 — Slowloris Handling      : 2 pts
+  D03 — RUDY Handling           : 2 pts
+  D04 — Fail-Close (CRITICAL)   : 4 pts
+  D04 — Fail-Open (MEDIUM)      : 3 pts
+  D05 — Circuit Breaker         : 2 pts
+  D06 — Backend Timeout         : 1 pt
+  D07 — Recovery                : 1 pt
+  D08+D09 — Fail-Mode Config    : 2 pts
+
+  WAF cần đạt ≥ 8/20 điểm thô để max INT-04.
+  Các tổ hợp đạt max: pass D01(3)+D04(4)+D05(2)=9, or D04(7)+D07(1)=8, etc.</pre>
+</div><div class="footer">
+WAF Benchmark Tool v2.7 — Phase D: Resilience & Degradation Tests
+<br>Generated by WAF-BENCHMARK-NEW | INT-04 Criterion
+</div></div></body></html>

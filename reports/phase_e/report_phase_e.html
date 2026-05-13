@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAF Benchmark — Phase E: Extensibility Tests</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #161822;
+  --surface2: #1e2030;
+  --border: #2a2d3e;
+  --text: #c9d1d9;
+  --subtle: #8b949e;
+  --green: #3fb950;
+  --red: #f85149;
+  --yellow: #d29922;
+  --blue: #58a6ff;
+  --purple: #bc8cff;
+  --orange: #f0883e;
+  --code-bg: #0d1117;
+  --code-border: #30363d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6; padding: 24px;
+}
+h1 { font-size: 1.5rem; margin-bottom: 8px; color: var(--blue); }
+h2 { font-size: 1.25rem; margin: 24px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; color: var(--purple); }
+h3 { font-size: 1.1rem; margin: 16px 0 8px; color: var(--text); }
+h4 { font-size: 0.95rem; margin: 12px 0 6px; color: var(--subtle); }
+.meta { color: var(--subtle); font-size: 0.85rem; margin-bottom: 16px; }
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px; margin-bottom: 16px;
+}
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; }
+.badge-pass { background: rgba(63,185,80,0.15); color: var(--green); }
+.badge-fail { background: rgba(248,81,73,0.15); color: var(--red); }
+.badge-skip { background: rgba(210,153,34,0.15); color: var(--yellow); }
+table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.85rem; }
+th, td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--subtle); font-weight: 600; }
+.code-block { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 6px; padding: 12px; overflow-x: auto; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 0.8rem; line-height: 1.45; }
+.scoring-explain { padding: 10px 14px; border-radius: 6px; font-size: 0.85rem; margin: 8px 0; }
+.scoring-explain.pass { background: rgba(63,185,80,0.08); border-left: 3px solid var(--green); }
+.scoring-explain.fail { background: rgba(248,81,73,0.08); border-left: 3px solid var(--red); }
+.detail-section { padding: 8px 0; }
+details { margin: 8px 0; }
+details summary { cursor: pointer; font-weight: 600; color: var(--blue); padding: 4px 0; }
+details[open] summary { margin-bottom: 8px; }
+.pass-rate { font-size: 1.5rem; font-weight: 700; }
+.pass-rate.good { color: var(--green); }
+.pass-rate.bad { color: var(--red); }
+.score-card { text-align: center; padding: 12px; }
+.score-card .value { font-size: 2rem; font-weight: 800; }
+.score-card .label { font-size: 0.8rem; color: var(--subtle); margin-top: 4px; }
+.tier-item { margin: 8px 0; padding: 8px 12px; background: var(--surface2); border-radius: 6px; }
+.cache-table th { font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<h1>WAF-BENCHMARK — Phase E: Extensibility Tests</h1>
+<div class="meta">
+  Timestamp: 2026-05-11T18:41:18+07:00 | WAF Target: http://127.0.0.1:8080 | WAF Mode: enforce<br>
+  Config: /var/www/waf.yaml (yaml) | Duration: 12.0s
+</div>
+
+<div class="card">
+<h3>Pre-Flight Health Checks</h3>
+<table>
+<tr><td>WAF Alive</td><td style="color:var(--green);">✓ true</td></tr>
+<tr><td>UPSTREAM Healthy</td><td style="color:var(--green);">✓ true</td></tr>
+<tr><td>WAF Config Detected</td><td style="color:var(--green);">✓ true</td></tr>
+</table>
+</div>
+<div class="card">
+<h3>🔄 Reset Sequence (5 steps — §3.1)</h3>
+<table>
+<tr><th>#</th><th>Step</th><th>Status</th><th>Latency</th></tr><tr>
+<td>1</td><td>Reset UPSTREAM</td>
+<td style="color:var(--green);">200 ✓</td>
+<td>1.8ms</td></tr><tr>
+<td>2</td><td>UPSTREAM health check</td>
+<td style="color:var(--green);">200 ✓</td>
+<td>1.7ms</td></tr><tr>
+<td>3</td><td>Set WAF profile (enforce)</td>
+<td style="color:var(--red);">403 ✗</td>
+<td>4005.6ms</td></tr><tr>
+<td>4</td><td>Flush WAF cache</td>
+<td style="color:var(--red);">403 ✗</td>
+<td>4004.5ms</td></tr><tr>
+<td>5</td><td>Reset WAF state</td>
+<td style="color:var(--red);">403 ✗</td>
+<td>4004.7ms</td></tr></table>
+<div style="margin-top:8px;">Result: <span style="color:var(--red);font-weight:700;">✗ ALL 5/5 OK</span></div>
+</div><h2>📊 Scoring Summary</h2>
+<div class="row">
+<div class="card" style="flex:1;min-width:120px;">
+<div class="score-card">
+<div class="value pass-rate bad">0<span style="font-size:0.5em;">%</span></div>
+<div class="label">Pass Rate</div>
+<div style="font-size:0.8rem;color:var(--subtle);">0/0/0 tests</div>
+</div>
+</div>
+<div class="card" style="flex:1;min-width:120px;">
+<div class="score-card">
+<div class="value" style="color:var(--blue);">0<span style="font-size:0.5em;color:var(--subtle);">/10</span></div>
+<div class="label">EXT Score</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Scoring Breakdown</h3>
+<table>
+<tr><th>Test</th><th>Max</th><th>Result</th><th>Earned</th><th>Sub-Scores</th></tr></table></div>
+
+<div class="card">
+<h3>Scoring Map</h3>
+<table>
+<tr><th>Criterion</th><th>Description</th><th>Max</th><th>Formula</th></tr>
+<tr>
+<td>EXT</td><td>Extensibility</td><td>10</td>
+<td><code>EXT-01 (3 pts binary) + EXT-02 (3 pts binary) + EXT-03 (4 pts sum of sub-tests)</code></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>📐 Scoring Methodology</h3>
+<pre style="font-size:0.82rem;line-height:1.5;">EXT — Extensibility (10 pts max)
+
+Scoring Methodology (per phase_E.md v2.4 §1):
+
+  EXT-01 — Hot-reload Add Rule    : 3 pts (binary: pass = 3, fail = 0)
+  EXT-02 — Hot-reload Remove Rule  : 3 pts (binary: pass = 3, fail = 0)
+  EXT-03 — Caching Correctness     : 4 pts (1 pt per sub-test E01–E04)
+
+  Total Phase E = EXT-01 + EXT-02 + EXT-03 = 10 pts
+
+  EXT-01 and EXT-02 are binary (all-or-nothing) — no partial credit.
+  EXT-03 is sum of sub-tests, each sub-test 1 point (binary).
+
+  EXT-03 Sub-Tests:
+    E01 — STATIC route cached (HIT)           : 1 pt
+    E02 — CRITICAL route NOT cached            : 1 pt
+    E03 — STATIC TTL expiry                     : 1 pt
+    E04 — Authenticated route NOT cached        : 1 pt
+
+  NOTE: If config format not recognized, EXT-01/EXT-02 are skipped;
+  EXT-03 runs normally (does not need config edits).</pre>
+</div>
+<div class="meta" style="margin-top:24px;text-align:center;">
+WAF Benchmark Tool v0.8.24 — Phase E Report | Generated: 2026-05-11T18:41:18+07:00 | Duration: 12.0s
+</div>
+</body></html>

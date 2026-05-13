@@ -1,0 +1,15 @@
+{
+  "phase": "A",
+  "summary": {
+    "total_detected": 0,
+    "passed": 0,
+    "failed": 0,
+    "ba01_passed": 0,
+    "ba02_passed": 0,
+    "mandatory_scored": 0,
+    "session_suspension_ok": 0,
+    "submit_ok": 0,
+    "access_restored_ok": 0
+  },
+  "lifecycles": []
+}

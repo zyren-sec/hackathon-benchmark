@@ -1,54 +1,35 @@
 benchmark:
   version: "2.1"
 
-  # Target application settings
+  # Cấu hình Target Application (UPSTREAM)
   target_app:
-    host: "127.0.0.1"
+    scheme: "http"
+    host: "220.158.233.101"
     port: 9000
     control_secret: "waf-hackathon-2026-ctrl"
 
-  # WAF settings
+  # Cấu hình WAF-PROXY (Đối tượng đánh giá)
   waf:
-    host: "127.0.0.1"
+    scheme: "http"
+    host: "220.158.233.101"
     port: 8080
-    binary_path: "./waf"
-    config_path: "./waf.yaml"
-    audit_log_path: "./waf_audit.log"
+    admin_port: 8081
+    metrics_port: 6190
+    binary_path: "/var/www/WAF-PROXY/target/release/waf"
+    config_path: "/var/www/WAF-PROXY/waf.yaml"
+    audit_log_path: "/var/www/WAF-PROXY/waf_audit.log"
 
-  # Phase-specific test parameters
-  phases:
-    phase_a:
-      reset_before_each: true
-      timeout_per_test_ms: 5000
+  # Cấu hình WAF-FE Dashboard
+  waf_fe:
+    host: "220.158.233.101"
+    port: 3000
+    enabled: true
+    skip_if_unavailable: true
 
-    phase_b:
-      ip_ranges:
-        brute_force: "127.0.0.10-19"
-        relay: "127.0.0.20-39"
-        behavioral: "127.0.0.40-59"
-        fraud: "127.0.0.60-79"
-        recon: "127.0.0.80-99"
+  # Resource Tier — WAF resource allocation level (BTC-controlled)
+  # Values: "min" (2C/4GB), "mid" (4C/8GB, default), "full" (6C/12GB max)
+  # If not set, defaults to WAF_RESOURCE_TIER env var, then "mid"
+  resource_tier: "mid"
 
-    phase_c:
-      duration_per_step_seconds: 30
-      target_rps_steps: [1000, 3000, 5000, 10000]
-
-    phase_d:
-      ddos_duration_seconds: 60
-      slowloris_connections: 500
-
-  # Scoring weights (from scoring_matrix.csv)
-  scoring:
-    security_effectiveness: 40
-    performance: 20
-    intelligence: 20
-    extensibility: 10
-    architecture: 15
-    dashboard: 10
-    deployment: 5
-
-  # Pass/fail thresholds
-  thresholds:
-    p99_latency_ms: 5
-    max_memory_mb: 100
-    false_positive_rate_max: 0.01
+  # Danh sách Proxy IP
+  proxy_pool_path: "/var/www/docs/hackathon/proxy_ip.md"

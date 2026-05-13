@@ -1,0 +1,1485 @@
+{
+  "phase": "D",
+  "timestamp": "2026-05-12T12:06:13+07:00",
+  "waf_target": "http://220.158.233.101:8080",
+  "waf_mode": "enforce",
+  "duration_ms": 268764,
+  "pre_check_passed": true,
+  "waf_alive": true,
+  "upstream_alive": true,
+  "reset_all_passed": true,
+  "raw_score": 1,
+  "raw_max_score": 20,
+  "int04_score": 1,
+  "int04_cap": 8,
+  "passed_tests": 1,
+  "failed_tests": 7,
+  "skipped_tests": 1,
+  "pass_rate": 0.1111111111111111,
+  "reset_sequence": [
+    {
+      "step": 1,
+      "name": "Reset UPSTREAM",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 4.602
+    },
+    {
+      "step": 2,
+      "name": "UPSTREAM health check",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 3.201
+    },
+    {
+      "step": 3,
+      "name": "Set UPSTREAM health (normal)",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.603
+    },
+    {
+      "step": 4,
+      "name": "Set UPSTREAM slow (no delay)",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 0.974
+    },
+    {
+      "step": 5,
+      "name": "Set WAF profile (enforce)",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 3.253
+    },
+    {
+      "step": 6,
+      "name": "Flush WAF cache",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 5.211
+    },
+    {
+      "step": 7,
+      "name": "Reset WAF state",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 4.898
+    },
+    {
+      "step": 8,
+      "name": "WAF health check",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.041
+    },
+    {
+      "step": 9,
+      "name": "Verify health",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 21.577
+    }
+  ],
+  "tests": [
+    {
+      "test_id": "D01",
+      "name": "HTTP Flood Survival",
+      "category": "ddos",
+      "description": "WAF sống sót qua HTTP flood 50,000+ RPS trong 60 giây và vẫn xử lý legitimate requests.",
+      "pass_criterion": "≥7/10 legitimate requests trong flood và ≥9/10 legitimate requests sau flood được xử lý; WAF không crash; không có circuit_breaker action.",
+      "max_score": 3,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "insufficient_flood_load",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 71.324151086,
+      "scoring_explanation": "✗ FAIL — insufficient_flood_load\n  → Score: +0 pts\n  • Reason: Flood tool achieved \u003c10% of target RPS — WAF rate-limiting prevented valid stress test\n  • During-flood: 5/5 passed\n  • Post-flood: 5/5 passed",
+      "tool_output": {
+        "tool": "wrk2",
+        "exit_code": 0,
+        "stdout": "Running 1m test @ http://220.158.233.101:8080/\n  20 threads and 500 connections\n  Thread calibration: mean lat.: 4794.788ms, rate sampling interval: 15802ms\n  Thread calibration: mean lat.: 4813.166ms, rate sampling interval: 13557ms\n  Thread calibration: mean lat.: 4935.672ms, rate sampling interval: 17301ms\n  Thread calibration: mean lat.: 5189.073ms, rate sampling interval: 17809ms\n  Thread calibration: mean lat.: 5380.005ms, rate sampling interval: 19185ms\n  Thread calibration: mean lat.: 4798.796ms, rate sampling interval: 13246ms\n  Thread calibration: mean lat.: 4989.547ms, rate sampling interval: 13926ms\n  Thread calibration: mean lat.: 5035.520ms, rate sampling interval: 13860ms\n  Thread calibration: mean lat.: 4794.026ms, rate sampling interval: 13443ms\n  Thread calibration: mean lat.: 5076.825ms, rate sampling interval: 14188ms\n  Thread calibration: mean lat.: 4652.557ms, rate sampling interval: 12075ms\n  Thread calibration: mean lat.: 4679.533ms, rate sampling interval: 13066ms\n  Thread calibration: mean lat.: 5561.741ms, rate sampling interval: 18939ms\n  Thread calibration: mean lat.: 4463.242ms, rate sampling interval: 12148ms\n  Thread calibration: mean lat.: 4650.144ms, rate sampling interval: 11984ms\n  Thread calibration: mean lat.: 4899.693ms, rate sampling interval: 10256ms\n  Thread calibration: mean lat.: 5047.278ms, rate sampling interval: 17580ms\n  Thread calibration: mean lat.: 3950.364ms, rate sampling interval: 11329ms\n  Thread calibration: mean lat.: 4395.660ms, rate sampling interval: 9912ms\n  Thread calibration: mean lat.: 4634.589ms, rate sampling interval: 10248ms\n  Thread Stats   Avg      Stdev     Max   +/- Stdev\n    Latency    34.15s    14.67s    1.00m    59.07%\n    Req/Sec     2.02      0.65     3.00     98.41%\n  Latency Distribution (HdrHistogram - Recorded Latency)\n 50.000%   34.90s \n 75.000%   46.92s \n 90.000%    0.88m \n 99.000%    1.00m \n 99.900%    1.00m \n 99.990%    1.00m \n 99.999%    1.00m \n100.000%    1.00m \n\n  Detailed Percentile spectrum:\n       Value   Percentile   TotalCount 1/(1-Percentile)\n\n   10092.543     0.000000            1         1.00\n   15040.511     0.100000          259         1.11\n   18923.519     0.200000          498         1.25\n   21692.415     0.300000          747         1.43\n   29900.799     0.400000          994         1.67\n   34897.919     0.500000         1249         2.00\n   36503.551     0.550000         1374         2.22\n   39550.975     0.600000         1491         2.50\n   40435.711     0.650000         1620         2.86\n   43450.367     0.700000         1750         3.33\n   46923.775     0.750000         1865         4.00\n   48529.407     0.775000         1927         4.44\n   48824.319     0.800000         1990         5.00\n   49020.927     0.825000         2051         5.71\n   52494.335     0.850000         2129         6.67\n   52559.871     0.875000         2184         8.00\n   52625.407     0.887500         2213         8.89\n   52756.479     0.900000         2244        10.00\n   56426.495     0.912500         2269        11.43\n   57147.391     0.925000         2299        13.33\n   57999.359     0.937500         2333        16.00\n   58392.575     0.943750         2347        17.78\n   58621.951     0.950000         2363        20.00\n   58916.863     0.956250         2377        22.86\n   59473.919     0.962500         2393        26.67\n   59539.455     0.968750         2420        32.00\n   59539.455     0.971875         2420        35.56\n   59572.223     0.975000         2436        40.00\n   59572.223     0.978125         2436        45.71\n   59604.991     0.981250         2450        53.33\n   59604.991     0.984375         2450        64.00\n   59637.759     0.985938         2455        71.11\n   59637.759     0.987500         2455        80.00\n   59670.527     0.989062         2458        91.43\n   59736.063     0.990625         2465       106.67\n   59768.831     0.992188         2478       128.00\n   59768.831     0.992969         2478       142.22\n   59768.831     0.993750         2478       160.00\n   59768.831     0.994531         2478       182.86\n   59768.831     0.995313         2478       213.33\n   59768.831     0.996094         2478       256.00\n   59768.831     0.996484         2478       284.44\n   59768.831     0.996875         2478       320.00\n   59801.599     0.997266         2481       365.71\n   59801.599     0.997656         2481       426.67\n   59801.599     0.998047         2481       512.00\n   59801.599     0.998242         2481       568.89\n   59834.367     0.998437         2484       640.00\n   59834.367     0.998633         2484       731.43\n   59834.367     0.998828         2484       853.33\n   59834.367     0.999023         2484      1024.00\n   59834.367     0.999121         2484      1137.78\n   59834.367     0.999219         2484      1280.00\n   59834.367     0.999316         2484      1462.86\n   59834.367     0.999414         2484      1706.67\n   59834.367     0.999512         2484      2048.00\n   59834.367     0.999561         2484      2275.56\n   59867.135     0.999609         2485      2560.00\n   59867.135     1.000000         2485          inf\n#[Mean    =    34150.056, StdDeviation   =    14670.352]\n#[Max     =    59834.368, Total count    =         2485]\n#[Buckets =           27, SubBuckets     =         2048]\n----------------------------------------------------------\n  3183 requests in 1.00m, 13.46MB read\n  Socket errors: connect 0, read 0, write 0, timeout 11791\nRequests/sec:     52.92\nTransfer/sec:    229.15KB\n",
+        "summary": ""
+      },
+      "flood_metrics": {
+        "target_rps": 50000,
+        "actual_rps": 52.92,
+        "transfer_sec": "229.15KB",
+        "latency_avg_ms": 0,
+        "latency_stdev_ms": 0,
+        "latency_max_ms": 0,
+        "latency_p50_ms": 0,
+        "latency_p75_ms": 0,
+        "latency_p90_ms": 1,
+        "latency_p99_ms": 1,
+        "socket_errors": {
+          "connect": 0,
+          "read": 0,
+          "timeout": 11791,
+          "write": 0
+        },
+        "total_requests": 0,
+        "duration_sec": 0
+      },
+      "during_verify": {
+        "phase": "During-flood",
+        "all_passed": true,
+        "passed_count": 5,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 5051.093,
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 11012.316,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/about",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 11066.207,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 11077.754,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/sitemap.xml",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 11141.475,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          }
+        ]
+      },
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": true,
+        "passed_count": 5,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/about",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 455.339,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 456.954,
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 936.415,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/sitemap.xml",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 2616.387,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 2915.8,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.210 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          }
+        ]
+      },
+      "accept_actions": [
+        "rate_limit",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "waf_crashed",
+          "description": "WAF process died during or after flood",
+          "triggered": false
+        },
+        {
+          "id": "during_verify_fail",
+          "description": "\u003c7/10 legitimate requests passed during flood",
+          "triggered": false
+        },
+        {
+          "id": "insufficient_flood_load",
+          "description": "Flood tool achieved \u003c10% of target RPS — WAF rate-limiting prevented valid stress test",
+          "triggered": true,
+          "evidence": "insufficient_flood_load"
+        },
+        {
+          "id": "after_verify_fail",
+          "description": "\u003c9/10 legitimate requests passed after flood",
+          "triggered": false
+        },
+        {
+          "id": "circuit_breaker",
+          "description": "Legitimate requests received circuit_breaker (503) — unacceptable per contract §3.1 for volumetric abuse",
+          "triggered": false
+        },
+        {
+          "id": "tool_error",
+          "description": "Flood tool (wrk2) failed to execute or returned unexpected output",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +3 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D02",
+      "name": "Slowloris Defense",
+      "category": "ddos",
+      "description": "WAF phát hiện và timeout 500 slow connections (1 byte/s headers, không bao giờ hoàn thành) trong 30 giây, đồng thời vẫn chấp nhận kết nối mới hợp lệ.",
+      "pass_criterion": "≥90% slow connections bị timeout/closed (\u003c120s); Service Available = YES; legitimate traffic vẫn accepted.",
+      "max_score": 2,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "no_connections_established",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 31.017593366,
+      "scoring_explanation": "✗ FAIL — no_connections_established\n  → Score: +0 pts\n  • Reason: slowhttptest could not establish any connections — WAF may be blocking at connection level\n  • Connections: 0 closed, 0 pending, 0 error\n  • Service Available: true",
+      "tool_output": {
+        "tool": "slowhttptest",
+        "exit_code": 0,
+        "stdout": "Tue May 12 12:07:27 2026:\u001b[H\u001b[2JTue May 12 12:07:27 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:27 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m0\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        1\n\u001b[1;32mconnected:   \u001b[1;32m        0\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:32 2026:\u001b[H\u001b[2JTue May 12 12:07:32 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:32 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m5\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:37 2026:\u001b[H\u001b[2JTue May 12 12:07:37 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:37 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m10\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:42 2026:\u001b[H\u001b[2JTue May 12 12:07:42 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:42 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m15\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:47 2026:\u001b[H\u001b[2JTue May 12 12:07:47 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:47 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m20\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:52 2026:\u001b[H\u001b[2JTue May 12 12:07:52 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:52 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m25\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:57 2026:\u001b[H\u001b[2JTue May 12 12:07:57 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW HEADERS\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          52\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:57 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m30\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:07:58 2026:\u001b[0;36m\nTest ended on 31th second\nExit status:\u001b[1;36m Hit test time limit\n\u001b[0m\u001b[0;36mCSV report saved to \u001b[1;36md02.csv\n\u001b[0m\u001b[0;36mHTML report saved to \u001b[1;36md02.html\n\u001b[0m",
+        "summary": ""
+      },
+      "slow_metrics": {
+        "connections_open": 0,
+        "connections_closed": 0,
+        "connections_error": 0,
+        "connections_pending": 0,
+        "service_available": true,
+        "exit_status": 0,
+        "test_duration_sec": 0
+      },
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": true,
+        "passed_count": 5,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/about",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 22.085,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.211 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 73.334,
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.211 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 89.706,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.211 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/sitemap.xml",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 107.458,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.211 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 108.566,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.211 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          }
+        ]
+      },
+      "accept_actions": [
+        "timeout",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "service_unavailable",
+          "description": "Service Available = NO — WAF không chấp nhận kết nối mới",
+          "triggered": false
+        },
+        {
+          "id": "high_pending",
+          "description": "≥50 connections still pending sau 120s — WAF không timeout connections",
+          "triggered": false
+        },
+        {
+          "id": "no_connections_established",
+          "description": "slowhttptest could not establish any connections — WAF may be blocking at connection level",
+          "triggered": true,
+          "evidence": "no_connections_established"
+        },
+        {
+          "id": "post_verify_fail",
+          "description": "Legitimate requests bị từ chối sau slowloris test",
+          "triggered": false
+        },
+        {
+          "id": "tool_error",
+          "description": "slowhttptest failed to execute",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +2 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D03",
+      "name": "RUDY Defense",
+      "category": "ddos",
+      "description": "WAF phát hiện và kill 500 slow POST connections (Content-Length: 1000000, nhỏ giọt 1 byte/s body) trong 30 giây.",
+      "pass_criterion": "≥90% slow POST connections bị timeout/closed; Service Available = YES; legitimate traffic vẫn accepted.",
+      "max_score": 2,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "no_connections_established",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 31.014375222,
+      "scoring_explanation": "✗ FAIL — no_connections_established\n  → Score: +0 pts\n  • Reason: slowhttptest could not establish any connections — WAF may be blocking at connection level\n  • Connections: 0 closed, 0 pending, 0 error\n  • Service Available: true",
+      "tool_output": {
+        "tool": "slowhttptest",
+        "exit_code": 0,
+        "stdout": "Tue May 12 12:07:58 2026:\u001b[H\u001b[2JTue May 12 12:07:58 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:07:58 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m0\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        1\n\u001b[1;32mconnected:   \u001b[1;32m        0\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:03 2026:\u001b[H\u001b[2JTue May 12 12:08:03 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:03 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m5\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:08 2026:\u001b[H\u001b[2JTue May 12 12:08:08 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:08 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m10\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:13 2026:\u001b[H\u001b[2JTue May 12 12:08:13 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:13 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m15\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:18 2026:\u001b[H\u001b[2JTue May 12 12:08:18 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:18 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m20\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        500\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        0\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:23 2026:\u001b[H\u001b[2JTue May 12 12:08:23 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:23 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m25\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        451\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        49\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:28 2026:\u001b[H\u001b[2JTue May 12 12:08:28 2026:\n\t\u001b[1;36mslowhttptest version 1.9.0\n - https://github.com/shekyan/slowhttptest -\n\u001b[0;34mtest type:\u001b[1;34m                        SLOW BODY\n\u001b[0;34mnumber of connections:\u001b[1;34m            500\n\u001b[0;34mURL:\u001b[1;34m                              http://220.158.233.101:8080/login\n\u001b[0;34mverb:\u001b[1;34m                             GET\n\u001b[0;34mcookie:\u001b[1;34m                           \n\u001b[0;34mheader:\u001b[1;34m                           \n\u001b[0;34mContent-Length header value:\u001b[1;34m      4096\n\u001b[0;34mfollow up data max size:\u001b[1;34m          50\n\u001b[0;34minterval between follow up data:\u001b[1;34m  10 seconds\n\u001b[0;34mconnections per seconds:\u001b[1;34m          200\n\u001b[0;34mprobe connection timeout:\u001b[1;34m         3 seconds\n\u001b[0;34mtest duration:\u001b[1;34m                    30 seconds\n\u001b[0;34musing proxy:\u001b[1;34m                      no proxy \n\n\u001b[0mTue May 12 12:08:28 2026:\u001b[1;32m\nslow HTTP test status on \u001b[0;32m30\u001b[1;32mth second:\n\n\u001b[1;32minitializing:\u001b[1;32m        0\n\u001b[1;32mpending:     \u001b[1;32m        0\n\u001b[1;32mconnected:   \u001b[1;32m        451\n\u001b[1;32merror:       \u001b[1;32m        0\n\u001b[1;32mclosed:      \u001b[1;32m        49\n\u001b[1;32mservice available:\u001b[1;32m   \u001b[1;32mYES\u001b[0m\n\u001b[0mTue May 12 12:08:29 2026:\u001b[0;36m\nTest ended on 31th second\nExit status:\u001b[1;36m Hit test time limit\n\u001b[0m\u001b[0;36mCSV report saved to \u001b[1;36md03.csv\n\u001b[0m\u001b[0;36mHTML report saved to \u001b[1;36md03.html\n\u001b[0m",
+        "summary": ""
+      },
+      "slow_metrics": {
+        "connections_open": 0,
+        "connections_closed": 0,
+        "connections_error": 0,
+        "connections_pending": 0,
+        "service_available": true,
+        "exit_status": 0,
+        "test_duration_sec": 0
+      },
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": true,
+        "passed_count": 5,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 334.208,
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.212 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 475.779,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.212 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/about",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 1002.331,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.212 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 1015.596,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.212 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/sitemap.xml",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 1633.573,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.212 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          }
+        ]
+      },
+      "accept_actions": [
+        "timeout",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "service_unavailable",
+          "description": "Service Available = NO — WAF không chấp nhận kết nối mới",
+          "triggered": false
+        },
+        {
+          "id": "high_pending",
+          "description": "≥50 connections still pending sau 120s",
+          "triggered": false
+        },
+        {
+          "id": "no_connections_established",
+          "description": "slowhttptest could not establish any connections — WAF may be blocking at connection level",
+          "triggered": true,
+          "evidence": "no_connections_established"
+        },
+        {
+          "id": "post_verify_fail",
+          "description": "Legitimate requests bị từ chối sau RUDY test",
+          "triggered": false
+        },
+        {
+          "id": "tool_error",
+          "description": "slowhttptest failed to execute",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +2 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D04",
+      "name": "WAF-Targeted Flood (Fail-Close + Fail-Open)",
+      "category": "ddos",
+      "description": "Khi WAF bị overload ở 100,000+ RPS, CRITICAL routes phải fail-close (503) và MEDIUM/CATCH_ALL/STATIC routes phải fail-open (200 từ upstream).",
+      "pass_criterion": "CRITICAL: 4/4 routes fail-close (503) → +4 pts; MEDIUM+CATCH_ALL+STATIC: ≥8/10 routes fail-open (200) → +3 pts.",
+      "max_score": 7,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "critical_fail_close",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 68.064710072,
+      "scoring_explanation": "✗ FAIL — critical_fail_close\n  → Score: +0 pts\n  • Reason: CRITICAL routes not all fail-close (503)\n  • CRITICAL: 0/4 correct (expected fail_close)\n  • MEDIUM: 2/5 correct (expected fail_open)\n  • CATCH_ALL: 3/3 correct (expected fail_open)\n  • STATIC: 1/2 correct (expected fail_open)",
+      "tool_output": {
+        "tool": "wrk2",
+        "exit_code": 0,
+        "stdout": "Running 1m test @ http://220.158.233.101:8080/\n  20 threads and 500 connections\n  Thread calibration: mean lat.: 8749.056ms, rate sampling interval: 19972ms\n  Thread calibration: mean lat.: 8727.113ms, rate sampling interval: 20103ms\n  Thread calibration: mean lat.: 9273.636ms, rate sampling interval: 19939ms\n  Thread calibration: mean lat.: 8474.949ms, rate sampling interval: 19972ms\n  Thread calibration: mean lat.: 8208.896ms, rate sampling interval: 19955ms\n  Thread calibration: mean lat.: 8441.173ms, rate sampling interval: 19955ms\n  Thread calibration: mean lat.: 7177.830ms, rate sampling interval: 17170ms\n  Thread calibration: mean lat.: 7599.465ms, rate sampling interval: 20070ms\n  Thread calibration: mean lat.: 8424.581ms, rate sampling interval: 19988ms\n  Thread calibration: mean lat.: 7217.265ms, rate sampling interval: 19431ms\n  Thread calibration: mean lat.: 9462.442ms, rate sampling interval: 20004ms\n  Thread calibration: mean lat.: 8575.658ms, rate sampling interval: 18399ms\n  Thread calibration: mean lat.: 7214.403ms, rate sampling interval: 19841ms\n  Thread calibration: mean lat.: 8274.628ms, rate sampling interval: 19939ms\n  Thread calibration: mean lat.: 8944.174ms, rate sampling interval: 19906ms\n  Thread calibration: mean lat.: 9035.776ms, rate sampling interval: 19906ms\n  Thread calibration: mean lat.: 8226.816ms, rate sampling interval: 19775ms\n  Thread calibration: mean lat.: 8693.436ms, rate sampling interval: 19890ms\n  Thread calibration: mean lat.: 7827.046ms, rate sampling interval: 19955ms\n  Thread calibration: mean lat.: 8901.290ms, rate sampling interval: 19922ms\n  Thread Stats   Avg      Stdev     Max   +/- Stdev\n    Latency    31.84s    14.92s    1.00m    52.32%\n    Req/Sec     1.68      0.47     2.00    100.00%\n  Latency Distribution (HdrHistogram - Recorded Latency)\n 50.000%   32.83s \n 75.000%   47.25s \n 90.000%    0.90m \n 99.000%    0.99m \n 99.900%    1.00m \n 99.990%    1.00m \n 99.999%    1.00m \n100.000%    1.00m \n\n  Detailed Percentile spectrum:\n       Value   Percentile   TotalCount 1/(1-Percentile)\n\n   10231.807     0.000000            1         1.00\n   11354.111     0.100000          193         1.11\n   15523.839     0.200000          385         1.25\n   21708.799     0.300000          577         1.43\n   24068.095     0.400000          773         1.67\n   32833.535     0.500000          963         2.00\n   33292.287     0.550000         1057         2.22\n   35946.495     0.600000         1153         2.50\n   37519.359     0.650000         1249         2.86\n   43220.991     0.700000         1345         3.33\n   47251.455     0.750000         1442         4.00\n   47644.671     0.775000         1496         4.44\n   47775.743     0.800000         1540         5.00\n   48562.175     0.825000         1595         5.71\n   48660.479     0.850000         1641         6.67\n   48758.783     0.875000         1691         8.00\n   49446.911     0.887500         1707         8.89\n   53968.895     0.900000         1732        10.00\n   54067.199     0.912500         1754        11.43\n   54132.735     0.925000         1790        13.33\n   54165.503     0.937500         1802        16.00\n   54231.039     0.943750         1818        17.78\n   54394.879     0.950000         1826        20.00\n   54722.559     0.956250         1838        22.86\n   55017.471     0.962500         1850        26.67\n   57311.231     0.968750         1861        32.00\n   58359.807     0.971875         1869        35.56\n   58458.111     0.975000         1873        40.00\n   58753.023     0.978125         1879        45.71\n   58884.095     0.981250         1886        53.33\n   59015.167     0.984375         1891        64.00\n   59146.239     0.985938         1894        71.11\n   59277.311     0.987500         1899        80.00\n   59310.079     0.989062         1900        91.43\n   59408.383     0.990625         1903       106.67\n   59441.151     0.992188         1906       128.00\n   59539.455     0.992969         1909       142.22\n   59539.455     0.993750         1909       160.00\n   59604.991     0.994531         1911       182.86\n   59637.759     0.995313         1912       213.33\n   59703.295     0.996094         1916       256.00\n   59703.295     0.996484         1916       284.44\n   59703.295     0.996875         1916       320.00\n   59703.295     0.997266         1916       365.71\n   59768.831     0.997656         1917       426.67\n   59801.599     0.998047         1918       512.00\n   59801.599     0.998242         1918       568.89\n   59801.599     0.998437         1918       640.00\n   59867.135     0.998633         1920       731.43\n   59867.135     0.998828         1920       853.33\n   59867.135     0.999023         1920      1024.00\n   59867.135     0.999121         1920      1137.78\n   59867.135     0.999219         1920      1280.00\n   59867.135     0.999316         1920      1462.86\n   59867.135     0.999414         1920      1706.67\n   59899.903     0.999512         1921      2048.00\n   59899.903     1.000000         1921          inf\n#[Mean    =    31837.423, StdDeviation   =    14920.896]\n#[Max     =    59867.136, Total count    =         1921]\n#[Buckets =           27, SubBuckets     =         2048]\n----------------------------------------------------------\n  2177 requests in 1.00m, 9.21MB read\n  Socket errors: connect 0, read 0, write 0, timeout 12779\nRequests/sec:     36.19\nTransfer/sec:    156.71KB\n",
+        "summary": ""
+      },
+      "tier_results": {
+        "CATCH_ALL": {
+          "tier": "CATCH_ALL",
+          "expected_code": 200,
+          "expected_mode": "fail_open",
+          "total_routes": 3,
+          "passed_routes": 3,
+          "all_passed": true,
+          "routes": [
+            {
+              "method": "GET",
+              "endpoint": "/sitemap.xml",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 11176.516,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CATCH_ALL"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/about",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 12002.012,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CATCH_ALL"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 12056.929,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CATCH_ALL"
+            }
+          ]
+        },
+        "CRITICAL": {
+          "tier": "CRITICAL",
+          "expected_code": 503,
+          "expected_mode": "fail_close",
+          "total_routes": 4,
+          "passed_routes": 0,
+          "all_passed": false,
+          "fail_reason": "0/4 CRITICAL routes fail-closed correctly",
+          "routes": [
+            {
+              "method": "POST",
+              "endpoint": "/otp",
+              "status_code": 401,
+              "expected_code": 503,
+              "latency_ms": 5689.688,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 503, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X POST 'http://220.158.233.101:8080/otp' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CRITICAL"
+            },
+            {
+              "method": "POST",
+              "endpoint": "/withdrawal",
+              "status_code": 401,
+              "expected_code": 503,
+              "latency_ms": 5711.045,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 503, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X POST 'http://220.158.233.101:8080/withdrawal' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CRITICAL"
+            },
+            {
+              "method": "POST",
+              "endpoint": "/deposit",
+              "status_code": 401,
+              "expected_code": 503,
+              "latency_ms": 8432.975,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 503, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X POST 'http://220.158.233.101:8080/deposit' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CRITICAL"
+            },
+            {
+              "method": "POST",
+              "endpoint": "/login",
+              "status_code": 401,
+              "expected_code": 503,
+              "latency_ms": 8458.703,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 503, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X POST 'http://220.158.233.101:8080/login' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "CRITICAL"
+            }
+          ]
+        },
+        "MEDIUM": {
+          "tier": "MEDIUM",
+          "expected_code": 200,
+          "expected_mode": "fail_open",
+          "total_routes": 5,
+          "passed_routes": 2,
+          "all_passed": false,
+          "fail_reason": "2/5 MEDIUM routes fail-open correctly",
+          "routes": [
+            {
+              "method": "GET",
+              "endpoint": "/game/list",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 9267.37,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/user/settings",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 9270.474,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/user/settings' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/api/profile",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 10227.684,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/api/profile' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/game/1",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 10874.349,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/game/1' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/api/transactions",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 10900.459,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/api/transactions' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            }
+          ]
+        },
+        "STATIC": {
+          "tier": "STATIC",
+          "expected_code": 200,
+          "expected_mode": "fail_open",
+          "total_routes": 2,
+          "passed_routes": 1,
+          "all_passed": false,
+          "routes": [
+            {
+              "method": "GET",
+              "endpoint": "/static/js/app.js",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 5970.601,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/static/js/app.js' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "STATIC"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/assets/css/style.css",
+              "status_code": 404,
+              "expected_code": 200,
+              "latency_ms": 6618.882,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 404",
+              "curl_command": "curl -s --interface 127.0.0.213 -X GET 'http://220.158.233.101:8080/assets/css/style.css' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "STATIC"
+            }
+          ]
+        }
+      },
+      "accept_actions": [
+        "rate_limit",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "waf_crashed",
+          "description": "WAF process died during flood",
+          "triggered": false
+        },
+        {
+          "id": "critical_fail_close",
+          "description": "CRITICAL routes not all fail-close (503)",
+          "triggered": true,
+          "evidence": "critical_fail_close"
+        },
+        {
+          "id": "medium_fail_open",
+          "description": "MEDIUM/CATCH_ALL/STATIC routes not all fail-open (200)",
+          "triggered": false
+        },
+        {
+          "id": "tool_error",
+          "description": "Flood tool (wrk2) failed to execute",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +7 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D05",
+      "name": "Backend Down / Circuit Breaker",
+      "category": "backend_failure",
+      "description": "Khi UPSTREAM bị DOWN, WAF phát hiện và circuit-break (trả 503 circuit_breaker), không treo.",
+      "pass_criterion": "Tất cả verification requests qua WAF trả về 503 với X-WAF-Action: circuit_breaker.",
+      "max_score": 2,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "no_circuit_breaker",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 6.4237340419999995,
+      "scoring_explanation": "✗ FAIL — no_circuit_breaker\n  → Score: +0 pts\n  • Reason: WAF không trả circuit_breaker — có thể treo, timeout, hoặc trả action khác",
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": false,
+        "passed_count": 0,
+        "total_count": 3,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 503,
+            "latency_ms": 786.812,
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 503, got 200; expected action 'circuit_breaker', got ''",
+            "curl_command": "curl -s --interface 127.0.0.215 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 503,
+            "latency_ms": 813.083,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 503, got 200; expected action 'circuit_breaker', got 'allow'",
+            "curl_command": "curl -s --interface 127.0.0.215 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "POST",
+            "endpoint": "/login",
+            "status_code": 401,
+            "expected_code": 503,
+            "latency_ms": 843.288,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 503, got 401; expected action 'circuit_breaker', got 'allow'",
+            "curl_command": "curl -s --interface 127.0.0.215 -X POST 'http://220.158.233.101:8080/login' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CRITICAL"
+          }
+        ]
+      },
+      "accept_actions": [
+        "circuit_breaker"
+      ],
+      "fail_conditions": [
+        {
+          "id": "no_circuit_breaker",
+          "description": "WAF không trả circuit_breaker — có thể treo, timeout, hoặc trả action khác",
+          "triggered": true,
+          "evidence": "no_circuit_breaker"
+        },
+        {
+          "id": "wrong_status",
+          "description": "WAF trả status khác 503",
+          "triggered": false
+        },
+        {
+          "id": "upstream_control_fail",
+          "description": "Không thể set UPSTREAM về chế độ DOWN",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +2 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D06",
+      "name": "Backend Slow / Timeout",
+      "category": "backend_failure",
+      "description": "Khi UPSTREAM chậm (delay 10s), WAF timeout và trả 504 thay vì treo.",
+      "pass_criterion": "Tất cả verification requests qua WAF trả về 504 Gateway Timeout.",
+      "max_score": 1,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "no_timeout",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 10.548213974,
+      "scoring_explanation": "✗ FAIL — no_timeout\n  → Score: +0 pts\n  • Reason: WAF không timeout — treo hoặc trả status khác",
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": false,
+        "passed_count": 0,
+        "total_count": 2,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 504,
+            "latency_ms": 36.483,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 504, got 200",
+            "curl_command": "curl -s --interface 127.0.0.216 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 504,
+            "latency_ms": 37.443,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 504, got 200",
+            "curl_command": "curl -s --interface 127.0.0.216 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          }
+        ]
+      },
+      "accept_actions": [
+        "timeout"
+      ],
+      "fail_conditions": [
+        {
+          "id": "no_timeout",
+          "description": "WAF không timeout — treo hoặc trả status khác",
+          "triggered": true,
+          "evidence": "no_timeout"
+        },
+        {
+          "id": "wrong_status",
+          "description": "WAF trả status khác 504",
+          "triggered": false
+        },
+        {
+          "id": "upstream_control_fail",
+          "description": "Không thể set UPSTREAM về chế độ SLOW",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +1 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D07",
+      "name": "Recovery",
+      "category": "backend_failure",
+      "description": "Sau khi UPSTREAM được khôi phục (từ DOWN và SLOW), WAF tiếp tục proxy bình thường.",
+      "pass_criterion": "Tất cả legitimate requests trả về 200 OK.",
+      "max_score": 1,
+      "passed": true,
+      "skipped": false,
+      "result": "PASS",
+      "score": 1,
+      "duration_sec": 0.624078315,
+      "scoring_explanation": "✓ PASS — Tất cả legitimate requests trả về 200 OK.\n  → Score: +1/1 pts\n  • 5/5 routes recovered to 200 OK",
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": true,
+        "passed_count": 5,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 79.898,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/health",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 80.918,
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/sitemap.xml",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 107.022,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/about",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 121.324,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 122.048,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "CATCH_ALL"
+          }
+        ]
+      },
+      "recovery_results": [
+        {
+          "method": "GET",
+          "endpoint": "/",
+          "status_code": 200,
+          "expected_code": 200,
+          "latency_ms": 38.467,
+          "waf_action": "allow",
+          "risk_score": 0,
+          "passed": true,
+          "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10"
+        },
+        {
+          "method": "GET",
+          "endpoint": "/about",
+          "status_code": 200,
+          "expected_code": 200,
+          "latency_ms": 79.039,
+          "waf_action": "allow",
+          "risk_score": 0,
+          "passed": true,
+          "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/about' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10"
+        },
+        {
+          "method": "GET",
+          "endpoint": "/health",
+          "status_code": 200,
+          "expected_code": 200,
+          "latency_ms": 79.982,
+          "risk_score": 0,
+          "passed": true,
+          "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/health' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10"
+        },
+        {
+          "method": "GET",
+          "endpoint": "/sitemap.xml",
+          "status_code": 200,
+          "expected_code": 200,
+          "latency_ms": 108.481,
+          "waf_action": "allow",
+          "risk_score": 0,
+          "passed": true,
+          "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/sitemap.xml' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10"
+        },
+        {
+          "method": "GET",
+          "endpoint": "/game/list",
+          "status_code": 200,
+          "expected_code": 200,
+          "latency_ms": 123.214,
+          "waf_action": "allow",
+          "risk_score": 0,
+          "passed": true,
+          "curl_command": "curl -s --interface 127.0.0.217 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10"
+        }
+      ],
+      "recovered": true,
+      "accept_actions": [
+        "allow"
+      ],
+      "fail_conditions": [
+        {
+          "id": "recovery_fail",
+          "description": "WAF không phục hồi sau khi UPSTREAM restored",
+          "triggered": false
+        },
+        {
+          "id": "still_circuit_broken",
+          "description": "WAF vẫn circuit-break sau khi UPSTREAM healthy",
+          "triggered": false
+        },
+        {
+          "id": "still_timeout",
+          "description": "WAF vẫn timeout sau khi UPSTREAM fast",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +1 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D08",
+      "name": "Fail-Mode Configurable",
+      "category": "fail_mode_config",
+      "description": "Chứng minh fail-mode có thể cấu hình được — đổi MEDIUM tier fail_mode: close trong WAF config và hot-reload, MEDIUM routes chuyển từ fail-open sang fail-close dưới tải.",
+      "pass_criterion": "Sau khi config MEDIUM tier fail_mode=close, ≥4/5 MEDIUM routes fail-close (503) dưới tải.",
+      "max_score": 1,
+      "passed": false,
+      "skipped": false,
+      "fail_reason": "medium_not_fail_close",
+      "result": "FAIL",
+      "score": 0,
+      "duration_sec": 31.345982011,
+      "scoring_explanation": "✗ FAIL — medium_not_fail_close\n  → Score: +0 pts\n  • Reason: MEDIUM routes vẫn fail-open sau khi đổi config",
+      "tool_output": {
+        "tool": "wrk2",
+        "exit_code": 0,
+        "stdout": "Running 30s test @ http://220.158.233.101:8080/\n  20 threads and 500 connections\n  Thread calibration: mean lat.: 8450.910ms, rate sampling interval: 19021ms\n  Thread calibration: mean lat.: 8520.635ms, rate sampling interval: 19120ms\n  Thread calibration: mean lat.: 7933.098ms, rate sampling interval: 18939ms\n  Thread calibration: mean lat.: 8934.707ms, rate sampling interval: 18956ms\n  Thread calibration: mean lat.: 8958.045ms, rate sampling interval: 18989ms\n  Thread calibration: mean lat.: 8642.944ms, rate sampling interval: 18972ms\n  Thread calibration: mean lat.: 8661.947ms, rate sampling interval: 18923ms\n  Thread calibration: mean lat.: 8499.931ms, rate sampling interval: 18972ms\n  Thread calibration: mean lat.: 8289.536ms, rate sampling interval: 18972ms\n  Thread calibration: mean lat.: 7941.957ms, rate sampling interval: 18857ms\n  Thread calibration: mean lat.: 8092.278ms, rate sampling interval: 16654ms\n  Thread calibration: mean lat.: 8647.748ms, rate sampling interval: 18661ms\n  Thread calibration: mean lat.: 8779.288ms, rate sampling interval: 18759ms\n  Thread calibration: mean lat.: 8669.070ms, rate sampling interval: 19021ms\n  Thread calibration: mean lat.: 8066.161ms, rate sampling interval: 18694ms\n  Thread calibration: mean lat.: 8453.389ms, rate sampling interval: 18546ms\n  Thread calibration: mean lat.: 7872.870ms, rate sampling interval: 18481ms\n  Thread calibration: mean lat.: 8490.780ms, rate sampling interval: 18612ms\n  Thread calibration: mean lat.: 8918.177ms, rate sampling interval: 19038ms\n  Thread calibration: mean lat.: 8485.449ms, rate sampling interval: 18939ms\n  Thread Stats   Avg      Stdev     Max   +/- Stdev\n    Latency    20.56s     6.57s   29.95s    48.38%\n    Req/Sec     1.00      0.00     1.00    100.00%\n  Latency Distribution (HdrHistogram - Recorded Latency)\n 50.000%   22.95s \n 75.000%   25.15s \n 90.000%   28.64s \n 99.000%   29.74s \n 99.900%   29.88s \n 99.990%   29.97s \n 99.999%   29.97s \n100.000%   29.97s \n\n  Detailed Percentile spectrum:\n       Value   Percentile   TotalCount 1/(1-Percentile)\n\n    9609.215     0.000000            1         1.00\n   10797.055     0.100000           59         1.11\n   12886.015     0.200000          117         1.25\n   13172.735     0.300000          179         1.43\n   20037.631     0.400000          234         1.67\n   22953.983     0.500000          294         2.00\n   23986.175     0.550000          322         2.22\n   24887.295     0.600000          362         2.50\n   24936.447     0.650000          382         2.86\n   25067.519     0.700000          414         3.33\n   25149.439     0.750000          444         4.00\n   25739.263     0.775000          454         4.44\n   26198.015     0.800000          468         5.00\n   28278.783     0.825000          486         5.71\n   28377.087     0.850000          498         6.67\n   28540.927     0.875000          513         8.00\n   28606.463     0.887500          521         8.89\n   28639.231     0.900000          527        10.00\n   28655.615     0.912500          536        11.43\n   28688.383     0.925000          543        13.33\n   28737.535     0.937500          550        16.00\n   28753.919     0.943750          553        17.78\n   28770.303     0.950000          556        20.00\n   28786.687     0.956250          565        22.86\n   28786.687     0.962500          565        26.67\n   28819.455     0.968750          567        32.00\n   28835.839     0.971875          573        35.56\n   28835.839     0.975000          573        40.00\n   28835.839     0.978125          573        45.71\n   28868.607     0.981250          575        53.33\n   28901.375     0.984375          576        64.00\n   29589.503     0.985938          577        71.11\n   29622.271     0.987500          578        80.00\n   29736.959     0.989062          579        91.43\n   29769.727     0.990625          580       106.67\n   29786.111     0.992188          581       128.00\n   29786.111     0.992969          581       142.22\n   29802.495     0.993750          582       160.00\n   29802.495     0.994531          582       182.86\n   29835.263     0.995313          583       213.33\n   29835.263     0.996094          583       256.00\n   29835.263     0.996484          583       284.44\n   29884.415     0.996875          584       320.00\n   29884.415     0.997266          584       365.71\n   29884.415     0.997656          584       426.67\n   29884.415     0.998047          584       512.00\n   29884.415     0.998242          584       568.89\n   29966.335     0.998437          585       640.00\n   29966.335     1.000000          585          inf\n#[Mean    =    20564.168, StdDeviation   =     6571.728]\n#[Max     =    29949.952, Total count    =          585]\n#[Buckets =           27, SubBuckets     =         2048]\n----------------------------------------------------------\n  933 requests in 30.15s, 3.95MB read\n  Socket errors: connect 0, read 0, write 0, timeout 6511\nRequests/sec:     30.95\nTransfer/sec:    134.00KB\n",
+        "summary": ""
+      },
+      "post_verify": {
+        "phase": "Post-test",
+        "all_passed": false,
+        "passed_count": 2,
+        "total_count": 5,
+        "routes": [
+          {
+            "method": "GET",
+            "endpoint": "/api/transactions",
+            "status_code": 401,
+            "expected_code": 200,
+            "latency_ms": 9332.533,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 200, got 401",
+            "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/api/transactions' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/api/profile",
+            "status_code": 401,
+            "expected_code": 200,
+            "latency_ms": 11872.849,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 200, got 401",
+            "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/api/profile' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/list",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 12628.807,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/user/settings",
+            "status_code": 401,
+            "expected_code": 200,
+            "latency_ms": 12630.502,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": false,
+            "fail_reason": "expected HTTP 200, got 401",
+            "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/user/settings' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          },
+          {
+            "method": "GET",
+            "endpoint": "/game/1",
+            "status_code": 200,
+            "expected_code": 200,
+            "latency_ms": 12684.262,
+            "waf_action": "allow",
+            "risk_score": 0,
+            "passed": true,
+            "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/game/1' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+            "tier": "MEDIUM"
+          }
+        ]
+      },
+      "tier_results": {
+        "MEDIUM": {
+          "tier": "MEDIUM",
+          "expected_code": 503,
+          "expected_mode": "fail_close",
+          "total_routes": 5,
+          "passed_routes": 2,
+          "all_passed": false,
+          "routes": [
+            {
+              "method": "GET",
+              "endpoint": "/game/list",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 11342.668,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/game/list' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/user/settings",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 11462.899,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/user/settings' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/api/transactions",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 13880.184,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/api/transactions' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/api/profile",
+              "status_code": 401,
+              "expected_code": 200,
+              "latency_ms": 15120.506,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": false,
+              "fail_reason": "expected HTTP 200, got 401",
+              "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/api/profile' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            },
+            {
+              "method": "GET",
+              "endpoint": "/game/1",
+              "status_code": 200,
+              "expected_code": 200,
+              "latency_ms": 16334.761,
+              "waf_action": "allow",
+              "risk_score": 0,
+              "passed": true,
+              "curl_command": "curl -s --interface 127.0.0.218 -X GET 'http://220.158.233.101:8080/game/1' -o /dev/null -w 'HTTP_%{http_code}' --max-time 10",
+              "tier": "MEDIUM"
+            }
+          ]
+        }
+      },
+      "accept_actions": [
+        "rate_limit",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "config_not_found",
+          "description": "Không tìm thấy WAF config file",
+          "triggered": false
+        },
+        {
+          "id": "config_format_error",
+          "description": "WAF config format không nhận diện được",
+          "triggered": false
+        },
+        {
+          "id": "config_not_applied",
+          "description": "Config change không có hiệu lực sau hot-reload",
+          "triggered": false
+        },
+        {
+          "id": "medium_not_fail_close",
+          "description": "MEDIUM routes vẫn fail-open sau khi đổi config",
+          "triggered": true,
+          "evidence": "medium_not_fail_close"
+        }
+      ],
+      "scoring_formula": "PASS → +1 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    },
+    {
+      "test_id": "D09",
+      "name": "Fail-Mode Restore",
+      "category": "fail_mode_config",
+      "description": "Revert fail-mode về open cho MEDIUM, hot-reload, và verify MEDIUM routes trở lại fail-open dưới tải.",
+      "pass_criterion": "Sau khi revert MEDIUM tier fail_mode=open, ≥4/5 MEDIUM routes fail-open (200) dưới tải.",
+      "max_score": 1,
+      "passed": false,
+      "skipped": true,
+      "skip_reason": "prerequisite D08 not met",
+      "result": "SKIP",
+      "score": 0,
+      "duration_sec": 0,
+      "scoring_explanation": "",
+      "accept_actions": [
+        "rate_limit",
+        "block"
+      ],
+      "fail_conditions": [
+        {
+          "id": "medium_not_fail_open",
+          "description": "MEDIUM routes vẫn fail-close sau khi revert",
+          "triggered": false
+        },
+        {
+          "id": "prereq_d08_failed",
+          "description": "Prerequisite D08 not met — cannot test restore",
+          "triggered": false
+        },
+        {
+          "id": "config_not_applied",
+          "description": "Config revert không có hiệu lực sau hot-reload",
+          "triggered": false
+        }
+      ],
+      "scoring_formula": "PASS → +1 pts | FAIL/SKIP → 0 pts | INT-04 = min(8, sum(all))"
+    }
+  ],
+  "categories": [
+    {
+      "id": "ddos",
+      "name": "DDoS Stress Tests",
+      "criterion": "INT-04",
+      "passed": 0,
+      "total": 4,
+      "score": 0,
+      "max_score": 14
+    },
+    {
+      "id": "backend_failure",
+      "name": "Backend Failure Tests",
+      "criterion": "INT-04",
+      "passed": 1,
+      "total": 3,
+      "score": 1,
+      "max_score": 4
+    },
+    {
+      "id": "fail_mode_config",
+      "name": "Fail-Mode Configurability",
+      "criterion": "INT-04",
+      "passed": 0,
+      "total": 2,
+      "score": 0,
+      "max_score": 2
+    }
+  ],
+  "scoring_breakdown": [
+    {
+      "test_id": "D01",
+      "name": "HTTP Flood Survival",
+      "max_score": 3,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D02",
+      "name": "Slowloris Defense",
+      "max_score": 2,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D03",
+      "name": "RUDY Defense",
+      "max_score": 2,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D04",
+      "name": "WAF-Targeted Flood (Fail-Close + Fail-Open)",
+      "max_score": 7,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D05",
+      "name": "Backend Down / Circuit Breaker",
+      "max_score": 2,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D06",
+      "name": "Backend Slow / Timeout",
+      "max_score": 1,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D07",
+      "name": "Recovery",
+      "max_score": 1,
+      "score_earned": 1,
+      "passed": true,
+      "skipped": false
+    },
+    {
+      "test_id": "D08",
+      "name": "Fail-Mode Configurable",
+      "max_score": 1,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": false
+    },
+    {
+      "test_id": "D09",
+      "name": "Fail-Mode Restore",
+      "max_score": 1,
+      "score_earned": 0,
+      "passed": false,
+      "skipped": true
+    }
+  ],
+  "scoring_map": {
+    "criterion": "INT-04",
+    "description": "Resilience \u0026 Degradation",
+    "max_points": 8,
+    "formula": "min(8, sum(D01..D09 sub-scores))",
+    "cap": 8,
+    "raw_max": 20
+  },
+  "scoring_methodology": "INT-04 — Resilience \u0026 Degradation (cap 8 pts, raw max 20 pts)\n\nScoring Methodology (per phase_D.md v2.3 §6):\n\n  raw_score = sum(D01..D09 sub-scores)\n  INT-04   = min(8, raw_score)\n\n  Where each sub-score = 0 if test FAIL/SKIP, else max_score\n\n  D01 — HTTP Flood Survival     : 3 pts\n  D02 — Slowloris Handling      : 2 pts\n  D03 — RUDY Handling           : 2 pts\n  D04 — Fail-Close (CRITICAL)   : 4 pts\n  D04 — Fail-Open (MEDIUM)      : 3 pts\n  D05 — Circuit Breaker         : 2 pts\n  D06 — Backend Timeout         : 1 pt\n  D07 — Recovery                : 1 pt\n  D08+D09 — Fail-Mode Config    : 2 pts\n\n  WAF cần đạt ≥ 8/20 điểm thô để max INT-04.\n  Các tổ hợp đạt max: pass D01(3)+D04(4)+D05(2)=9, or D04(7)+D07(1)=8, etc."
+}

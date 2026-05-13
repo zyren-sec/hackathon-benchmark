@@ -1,0 +1,41 @@
+{
+  "criterion": "SEC-02",
+  "phase": "Cross-1",
+  "negative_control": {
+    "__L01_STACKTRACE__": true,
+    "__L02_INTERNAL_IP__": true,
+    "__L03_DEBUG_SQL__": true,
+    "__L04_PII__": true,
+    "__L05_VERBOSE_404__": true
+  },
+  "total_responses": 4664,
+  "clean_responses": 3542,
+  "leaked_responses": 1122,
+  "global_filter_rate": 0.7594,
+  "score": 3.8,
+  "max_score": 5,
+  "marker_breakdown": {
+    "L01": {
+      "total_matches": 0,
+      "phases": []
+    },
+    "L02": {
+      "total_matches": 0,
+      "phases": []
+    },
+    "L03": {
+      "total_matches": 0,
+      "phases": []
+    },
+    "L04": {
+      "total_matches": 0,
+      "phases": []
+    },
+    "L05": {
+      "total_matches": 3366,
+      "phases": [
+        "C"
+      ]
+    }
+  }
+}

@@ -1,45 +1,12 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-/waf-benchmark
+# Binary outputs
+waf-benchmark
+enhanced-test
+simple-test
+waf-benchmark-phase-d
+waf-benchmark-phase-e
 
-# Test binary, built with `go test -c`
-*.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-# Dependency directories (remove the comment below to include it)
-vendor/
-
-# Go workspace file
-go.work
-
-# IDE files
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-*~
-
-# Local/private documentation excluded from public GitHub push
-docs/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Benchmark outputs
-reports/
-*.log
-*.json
-!benchmark_config.yaml
-!testdata/
-!testdata/app_capabilities.json
-
-# Build artifacts
-bin/
-dist/

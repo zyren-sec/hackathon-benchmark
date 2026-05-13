@@ -1,0 +1,65 @@
+<!-- SlowHTTPTest Analysis chart (c) Sergey Shekyan, Victor Agababov 2011  -->
+ <html>
+   <head>
+   <style>
+     body { font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif; background-color: transparent; color: #333; -webkit-font-smoothing: antialiased; } 
+     .slow_results {font-size: 12px; } 
+     </style>
+     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+     <script type="text/javascript">
+       google.load("visualization", "1", {packages:["corechart"]});
+       google.setOnLoadCallback(drawChart);
+       function drawChart() {
+         var data = new google.visualization.DataTable();
+         data.addColumn('string', 'Seconds');
+         data.addColumn('number', 'Closed');
+         data.addColumn('number', 'Pending');
+         data.addColumn('number', 'Connected');
+         data.addColumn('number', 'Service available');
+         data.addRows([
+['0',0,1,0,500],
+['1',0,1,186,500],
+['2',0,1,365,500],
+['3',0,0,500,500],
+['4',0,0,500,500],
+['5',0,0,500,500],
+['6',0,0,500,0],
+['7',0,0,500,0],
+['8',0,0,500,500],
+['9',0,0,500,500],
+['10',0,0,500,500],
+['11',0,0,500,500],
+['12',0,0,500,500],
+['13',0,0,500,500],
+['14',0,0,500,500],
+['15',0,0,500,500],
+['16',0,0,500,500],
+['17',0,0,500,500],
+['18',0,0,500,500],
+['19',0,0,500,500],
+['20',0,0,500,500],
+['21',49,0,451,500],
+['22',49,0,451,500],
+['23',49,0,451,500],
+['24',49,0,451,500],
+['25',49,0,451,500],
+['26',49,0,451,500],
+['27',49,0,451,500],
+['28',49,0,451,500],
+['29',49,0,451,500],
+['30',49,0,451,500],
+['31',98,0,402,500],
+        ]);
+         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+         chart.draw(data, {'width': 600, 'height': 360, 'title': 'Test results against http://220.158.233.101:8080/login',         hAxis: {'title': 'Seconds', 'titleTextStyle': {color: '#FF0000'}},
+         vAxis: {'title': 'Connections', 'titleTextStyle': {color: '#FF0000'}, 'viewWindowMode':'maximized'}
+     });
+     }
+     </script>
+     <title>SlowHTTPTest(tm) Connection Results</title>
+   </head>
+   <body>
+   <p><table class='slow_results' border='0'><tr><th>Test parameters</th></tr><tr><td><b>Test type</b></td><td>SLOW BODY</td></tr><tr><td><b>Number of connections</b></td><td>500</td></tr><tr><td><b>Verb</b></td><td>GET</td></tr><tr><td><b>Content-Length header value</b></td><td>4096</td></tr><tr><td><b>Cookie</b></td><td></td></tr><tr><td><b>Header</b></td><td></td></tr><tr><td><b>Extra data max length</b></td><td>50</td></tr><tr><td><b>Interval between follow up data</b></td><td>10 seconds</td></tr><tr><td><b>Connections per seconds</b></td><td>200</td></tr><tr><td><b>Timeout for probe connection</b></td><td>3</td></tr><tr><td><b>Target test duration</b></td><td>30 seconds</td></tr><tr><td><b>Using proxy</b></td><td>no proxy  </td></tr></table></p>
+     <div id="chart_div"></div>
+   </body>
+ </html>

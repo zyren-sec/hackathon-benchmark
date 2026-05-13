@@ -1,6 +1,0 @@
-# Sample datacenter/proxy IPs for benchmark abuse simulation.
-# Replace with an authoritative feed in private deployments if needed.
-127.0.0.30
-127.0.0.31
-127.0.0.32
-127.0.0.33

@@ -1,0 +1,74 @@
+{
+  "phase": "E",
+  "timestamp": "2026-05-11T18:41:18+07:00",
+  "waf_target": "http://127.0.0.1:8080",
+  "waf_mode": "enforce",
+  "duration_ms": 12023,
+  "precheck_passed": true,
+  "waf_alive": true,
+  "upstream_alive": true,
+  "config_format": "yaml",
+  "config_path": "/var/www/waf.yaml",
+  "config_detected": true,
+  "reset_sequence": [
+    {
+      "step": 1,
+      "name": "Reset UPSTREAM",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.798
+    },
+    {
+      "step": 2,
+      "name": "UPSTREAM health check",
+      "status_code": 200,
+      "success": true,
+      "latency_ms": 1.72
+    },
+    {
+      "step": 3,
+      "name": "Set WAF profile (enforce)",
+      "status_code": 403,
+      "success": false,
+      "latency_ms": 4005.635
+    },
+    {
+      "step": 4,
+      "name": "Flush WAF cache",
+      "status_code": 403,
+      "success": false,
+      "latency_ms": 4004.512
+    },
+    {
+      "step": 5,
+      "name": "Reset WAF state",
+      "status_code": 403,
+      "success": false,
+      "latency_ms": 4004.731
+    }
+  ],
+  "reset_all_passed": false,
+  "categories": null,
+  "tests": null,
+  "ext01_score": 0,
+  "ext01_max": 3,
+  "ext02_score": 0,
+  "ext02_max": 3,
+  "ext03_score": 0,
+  "ext03_max": 4,
+  "ext03_sub_scores": {},
+  "total_score": 0,
+  "max_score": 10,
+  "passed_tests": 0,
+  "failed_tests": 0,
+  "skipped_tests": 0,
+  "pass_rate": 0,
+  "scoring_breakdown": null,
+  "scoring_map": {
+    "criterion": "EXT",
+    "description": "Extensibility",
+    "max_points": 10,
+    "formula": "EXT-01 (3 pts binary) + EXT-02 (3 pts binary) + EXT-03 (4 pts sum of sub-tests)"
+  },
+  "scoring_methodology": "EXT — Extensibility (10 pts max)\n\nScoring Methodology (per phase_E.md v2.4 §1):\n\n  EXT-01 — Hot-reload Add Rule    : 3 pts (binary: pass = 3, fail = 0)\n  EXT-02 — Hot-reload Remove Rule  : 3 pts (binary: pass = 3, fail = 0)\n  EXT-03 — Caching Correctness     : 4 pts (1 pt per sub-test E01–E04)\n\n  Total Phase E = EXT-01 + EXT-02 + EXT-03 = 10 pts\n\n  EXT-01 and EXT-02 are binary (all-or-nothing) — no partial credit.\n  EXT-03 is sum of sub-tests, each sub-test 1 point (binary).\n\n  EXT-03 Sub-Tests:\n    E01 — STATIC route cached (HIT)           : 1 pt\n    E02 — CRITICAL route NOT cached            : 1 pt\n    E03 — STATIC TTL expiry                     : 1 pt\n    E04 — Authenticated route NOT cached        : 1 pt\n\n  NOTE: If config format not recognized, EXT-01/EXT-02 are skipped;\n  EXT-03 runs normally (does not need config edits)."
+}
